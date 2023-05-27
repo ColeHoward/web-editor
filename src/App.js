@@ -1,24 +1,17 @@
-import logo from './logo.svg';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import CodeEditor from "./pages/CodeEditor";
+import PythonConsole from "./components/PythonConsole";
+import TestComponent from "./TestComponent";
+import CodeEditor2 from "./components/CodeEditor2";
+import {DevelopmentPage} from "./pages/DevelopmentPage";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div className="App bg-dark">
+        <DevelopmentPage language={"html"} />
+        {/*  <TestComponent />*/}
+      </div>
   );
 }
 

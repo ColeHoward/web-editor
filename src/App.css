@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  background-color: #1A1A1A;
 }
 
 .App-logo {
@@ -35,4 +36,8 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.ͼ1 .cm-content[contenteditable=true] {
+  text-align: left !important;
 }

@@ -1,0 +1,48 @@
+/*#code-mirror-container .cm-scroller {*/
+/*    scrollbar-width: thin;*/
+/*    scrollbar-color: rebeccapurple green;*/
+/*}*/
+
+/*#code-mirror-container .cm-scroller::-webkit-scrollbar {*/
+/*    width: 12px;*/
+/*}*/
+
+/*#code-mirror-container .cm-scroller::-webkit-scrollbar-track {*/
+/*    background: green;*/
+/*}*/
+
+/*#code-mirror-container .cm-scroller::-webkit-scrollbar-thumb {*/
+/*    background-color: rebeccapurple;*/
+/*    border-radius: 20px;*/
+/*    border: 3px solid green;*/
+/*}*/
+/*.cm-scroller {*/
+/*    position: absolute !important;*/
+/*    overflow-y: auto;*/
+/*    height: 100vh !important;*/
+/*    width: 100%;*/
+/*}*/
+/*.cm-scroller::-webkit-scrollbar {*/
+/*    display: none;*/
+/*}*/
+
+/*.cm-scroller {*/
+/*    scrollbar-width: none; !* Firefox *!*/
+/*    -ms-overflow-style: none;  !* Internet Explorer 10+ *!*/
+/*}*/
+
+
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+/*!* Track *!*/
+/*::-webkit-scrollbar-track {*/
+/*    background: #1A1A1A;*/
+/*}*/
+
+/*!* Handle *!*/
+/*::-webkit-scrollbar-thumb {*/
+/*    background: #36454F;*/
+/*}*/
