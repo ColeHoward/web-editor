@@ -1,9 +1,10 @@
-const apiKey = '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';
 const port = 3001;
 const axios = require('axios');
 const express = require('express');
 const app = express();
 const cors = require('cors');
+
+require('dotenv').config();
 
 
 app.use(cors());
@@ -20,7 +21,7 @@ app.get('/query', async function (req, res) {
                 url: 'https://api.openai.com/v1/chat/completions',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`,
+                    'Authorization': `Bearer ${process.env.GPT3_API_KEY}`,
                 },
                 data: {
                     'model': 'gpt-3.5-turbo',
