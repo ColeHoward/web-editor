@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import CodeEditor from "./pages/CodeEditor";
 import PythonConsole from "./components/PythonConsole";
 import TestComponent from "./TestComponent";
-import CodeEditor2 from "./components/CodeEditor2";
 import {DevelopmentPage} from "./pages/DevelopmentPage";
 
 function App() {

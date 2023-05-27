@@ -22,8 +22,6 @@ def execute():
     return Response(generate(), mimetype='text/event-stream')
 
 
-
-
 @app.route('/', methods=['GET'])
 @cross_origin()
 def index():

@@ -1,16 +1,15 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import '../App.css';
-import PythonConsole from "../components/PythonConsole";
-import { styled } from "@stitches/react";
-import TestComponent from "../TestComponent";
-import PromptBox from "../components/PromptBox";
-import askGPT from "../utilities/api";
-import {formatCode, insertCode} from "../utilities/utils";
-import ContextMenu from "../components/ContextMenu";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './style/developmentPage.css'
+import { styled } from "@stitches/react";
+import PythonConsole from "../components/PythonConsole";
+import PromptBox from "../components/PromptBox";
+import askGPT from "../utilities/api";
+import ContextMenu from "../components/ContextMenu";
+import CodeEditor from "../components/CodeEditor";
+import {formatCode, insertCode} from "../utilities/utils";
 import {HtmlRenderer} from "../components/HtmlRenderer";
-import SimpleBar from 'simplebar-react';
 import {debounce} from "lodash";
 
 
@@ -222,7 +221,7 @@ export function DevelopmentPage({language}) {
 					<ContextMenu menuPosition={menuPosition} setPromptBoxVisible={setPromptBoxVisible}
 					onClick={() => setShowMenu(false)} setShowMenu={setShowMenu} showMenu={showMenu}/>
 				)}
-				<TestComponent code={code} setCode={setCode} language={language} editorRef={editorRef}
+				<CodeEditor code={code} setCode={setCode} language={language} editorRef={editorRef}
 								handleContextMenu={handleContextMenu}
 				/>
 			</Panel>
