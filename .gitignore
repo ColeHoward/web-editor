@@ -23,7 +23,7 @@
 /backend/go.sum
 /backend/main
 /backend/main.go
-
+/src/dev
 
 npm-debug.log*
 yarn-debug.log*
