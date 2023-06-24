@@ -38,3 +38,5 @@ export function insertCode(editor, chunk, isFirstChunk, from = null, to = null) 
     // Return the new insertion point
     return from + chunk.length;
 }
+
+

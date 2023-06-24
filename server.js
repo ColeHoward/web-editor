@@ -21,7 +21,7 @@ app.get('/query', async function (req, res) {
                 url: 'https://api.openai.com/v1/chat/completions',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${process.env.GPT3_API_KEY}`,
+                    'Authorization': `Bearer ${process.env.GPT_API_KEY}`,
                 },
                 data: {
                     'model': 'gpt-3.5-turbo',

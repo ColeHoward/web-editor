@@ -9,6 +9,9 @@ import SimpleBar from 'simplebar-react';
 
 let languageObjs = {"python": python, "html": html}
 
+function test(event){
+	console.log(event)
+}
 function CodeEditor({code, setCode, language, editorRef, handleContextMenu}) {
 	const cm = useRef(null);
 	useEffect(() => {
@@ -18,7 +21,7 @@ function CodeEditor({code, setCode, language, editorRef, handleContextMenu}) {
 	}, [cm.current]);
 
 	return (
-		<SimpleBar style={{ maxHeight: "100%" }} >
+
 			<CodeMirror
 				ref={cm}
 				value={code}
@@ -31,9 +34,7 @@ function CodeEditor({code, setCode, language, editorRef, handleContextMenu}) {
 				autoFocus={true}
 				onContextMenu={handleContextMenu}
 			/>
-		</SimpleBar>
 	);
 }
-
 
 export default CodeEditor;

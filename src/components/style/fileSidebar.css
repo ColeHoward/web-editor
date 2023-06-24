@@ -1,0 +1,33 @@
+.sidebar {
+    transition: width 0.3s ease-in-out;
+    float: left;
+    background-color: black;
+    color: white;
+    height: 100vh;
+}
+
+.open {
+    transition: width 0.3s ease-in-out;
+    position: relative;
+    width: 500px;
+    height: 100vh;
+}
+
+.closed {
+    transition: width 0.3s ease-in-out;
+    position: relative;
+    height: 100vh;
+    width: 100px;
+}
+
+.file-item {
+    color: white;
+}
+
+.css-1g86id8-MuiTreeItem-content {
+    padding: 0 3px !important;
+}
+
+.css-1g86id8-MuiTreeItem-content .MuiTreeItem-label {
+    padding-left: 0 !important;
+}

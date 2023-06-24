@@ -13,7 +13,7 @@ function PythonConsole({ pythonCode }) {
 		// Reset console output
 		setConsoleOutput('');
 
-		const url = `http://127.0.0.1:8000/execute`;
+		const url = `http://127.0.0.1:5000/execute`;
 
 		try {
 			console.log('Running Python code...', pythonCode)
@@ -54,8 +54,8 @@ function PythonConsole({ pythonCode }) {
 		<Card style={{ height: '100%',width: "100%", overflow: 'auto' }} className={"bg-dark text-light"} id={"pythonConsole"}>
 			<Card.Header style={{width: "100%"}}>
 				<img src={playIcon} alt="play" onClick={runPythonCode}
-					 style={{width: "20px", height: "20px", float: "left", marginRight: "10px"}} />
-				<img src={stopIcon} alt="stop" style={{width: "20px", height: "20px", float: "left"}} />
+					 style={{width: "20px", height: "20px", float: "left", margin: "5px 10px 0px 10px", cursor: "pointer"}} />
+				<img src={stopIcon} alt="stop" style={{width: "20px", height: "20px", float: "left", marginTop: "5px"}} />
 			</Card.Header>
 			<Card.Body style={{ textAlign: 'left', width: "100%", float: "left", backgroundColor: "#1A1A1A" }}>  {/* Add this line */}
 				<pre style={{ whiteSpace: 'pre', height: "100%", width: "100%", backgroundColor: "#1A1A1A", border: "none", color: "mediumpurple"  }}>{consoleOutput}</pre>

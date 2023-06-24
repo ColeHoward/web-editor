@@ -18,6 +18,12 @@
 .env.test.local
 .env.production.local
 .env
+/backend/.env
+/backend/go.mod
+/backend/go.sum
+/backend/main
+/backend/main.go
+
 
 npm-debug.log*
 yarn-debug.log*

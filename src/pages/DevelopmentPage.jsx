@@ -1,109 +1,40 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import '../components/style/tabbedStyle.css'
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './style/developmentPage.css'
-import { styled } from "@stitches/react";
+import '../pages/style/developmentPage.css'
 import PythonConsole from "../components/PythonConsole";
 import PromptBox from "../components/PromptBox";
 import askGPT from "../utilities/api";
 import ContextMenu from "../components/ContextMenu";
-import CodeEditor from "../components/CodeEditor";
-import {formatCode, insertCode} from "../utilities/utils";
+import {insertCode} from "../utilities/utils";
 import {HtmlRenderer} from "../components/HtmlRenderer";
-import {debounce} from "lodash";
+import {Divider} from "../components/Divider";
+import Panel from "../components/Panel";
+import Sidebar from "../components/Sidebar";
+import TabbedEditor from "../components/TabbedEditor";
 
 
-// eventually need to just make these CSS classes
-const Wrapper = styled("div", {
-	height: "100%",
-	width: "100%",
-	position: "relative",
-	display: "flex",
-	justifyContent: "space-between",
-	variants: {
-		isResizing: {
-			true: {
-				cursor: "col-resize"
-			}
-		}
-	}
-});
+export function DevelopmentPage({language, userId, projectId, projectFiles, setProjectFiles, projectTree}) {
 
-const Box = styled("div", {
-	position: "relative",
-	height: "100%",
-	width: "100%",
-	// padding: "1rem",
-	overflowY: "hidden",
-	// hide scrollbar
-
-});
-
-const Divider = styled("div", {
-	position: "relative",
-	height: "100%",
-	"&:after": {
-		content: "",
-		position: "absolute",
-		top: 0,
-		bottom: 0,
-		left: "-3px",
-		width: "6px",
-		// background: "transparent",
-		cursor: "col-resize",
-		// transiton: "all 50ms",
-		zIndex: 100
-	},
-
-	"&:hover": {
-		"&:after": {
-			background: "purple"
-		}
-	},
-	"&:active": {
-		"&:after": {
-			background: "purple"
-		}
-	},
-
-	variants: {
-		active: {
-			true: {
-				"&:after": {
-					background: "red !important"
-				}
-			}
-		}
-	}
-});
-
-function Panel({ children, width }) {
-	return (
-		<Box css={{ width: width ? `${width}px` : "100%" }}>
-			{children}
-		</Box>
-	);
-}
-
-
-export function DevelopmentPage({language}) {
-	/* ************************ HANDLE PANEL RESIZING ************************ */
-	const [panelWidths, setPanelWidths] = useState({leftWidth: window.innerWidth / 2,
-															  rightWidth: window.innerWidth / 2});
+	/******************************************* HANDLE PANEL RESIZING *******************************************/
+	const [panelWidths, setPanelWidths] = useState({
+			leftWidth: (window.innerWidth-40) / 2, // -40 to account for tab height
+			rightWidth: (window.innerWidth-40) / 2
+	});
+	// What am I using setCode for? I don't think I need it, unless for formatting or chatgpt
 	const [code, setCode] = useState('');
 
 	const onMouseDown = useCallback((e) => {
-		const shield = document.createElement('div');
-		shield.style.position = 'absolute';
-		shield.style.top = '0';
-		shield.style.left = '0';
-		shield.style.width = '100%';
-		shield.style.height = '100%';
-		shield.style.zIndex = '9999'; // This should be higher than the z-index of your iframe
-		shield.id = 'drag-shield';  // So you can find it later
-		document.body.appendChild(shield);
+		if (language === "html") {
+			// put shield over iframe so resizing works
+			const shield = document.createElement('div');
+			shield.id = 'drag-shield';  // So you can find it later
+			document.body.appendChild(shield);
+		}
 
 		const onMove = (e) => {
+			e.preventDefault() // prevent text selection when resizing
 			const { movementX } = e;
 			setPanelWidths((prevWidths) => {
 				const newLeftWidth = prevWidths.leftWidth + movementX;
@@ -115,9 +46,11 @@ export function DevelopmentPage({language}) {
 		const onMouseUp = () => {
 			window.removeEventListener('mousemove', onMove);
 			window.removeEventListener('mouseup', onMouseUp);
-			const shield = document.getElementById('drag-shield');
-			if (shield) {
-				shield.remove();
+			if (language === "html") {
+				const shield = document.getElementById('drag-shield');
+				if (shield) {
+					shield.remove();
+				}
 			}
 		};
 
@@ -126,16 +59,18 @@ export function DevelopmentPage({language}) {
 	}, []);
 
 
-	/* ************************ HANDLE CONTEXT MENU ************************ */
+	/******************************************* HANDLE CONTEXT MENU *******************************************/
 	const [menuPosition, setMenuPosition] = useState({x: '0px', y: '0px'});
 	const [showMenu, setShowMenu] = useState(false);
 	const selectedText = useRef(''); // Using useRef
 	const editorRef = useRef(null);
 
 	const handleContextMenu = (event) => {
+		console.log('in handle context menu')
 		event.preventDefault();
 
 		if (editorRef.current) {
+			console.log('editor not null')
 			const editor = editorRef.current;
 			const selection = editor.state.selection.main;
 			const doc = editor.state.doc;
@@ -147,16 +82,16 @@ export function DevelopmentPage({language}) {
 
 			setMenuPosition({ x: `${event.pageX}px`, y: `${event.pageY}px` });
 			setShowMenu(true);
+		}else {
+			console.log('editor is null')
 		}
 	};
 
-	/* ************************ HANDLE CHATGPT SUPPORT ************************ */
+	/****************************************** HANDLE CHAT GPT SUPPORT *******************************************/
 	const [promptBoxVisible, setPromptBoxVisible] = useState(false);
-
 	const handleGPTRequest = async (prompt) => {
 		let isFirstChunk = true;
 		let originalSelection;
-
 		if (editorRef.current) {
 			originalSelection = editorRef.current.state.selection.main;
 		}
@@ -167,7 +102,7 @@ export function DevelopmentPage({language}) {
 					if (isFirstChunk) {
 						isFirstChunk = false;
 						originalSelection.to = insertCode(editor, chunk, true, originalSelection.from,
-														  originalSelection.to);
+							originalSelection.to);
 					} else {
 						originalSelection.from = originalSelection.to;
 						originalSelection.to = insertCode(editor, chunk, false, originalSelection.from);
@@ -177,9 +112,6 @@ export function DevelopmentPage({language}) {
 		})
 		setPromptBoxVisible(false);
 	};
-	// useEffect(() => {
-	// 	console.log('code changed', code)
-	// }, [code])
 	const handlePromptSubmit = (inputValue) => {
 		handleGPTRequest(inputValue);
 	};
@@ -188,7 +120,7 @@ export function DevelopmentPage({language}) {
 		setPromptBoxVisible(false);
 	};
 
-	/* ************************ HANDLE CODE OUTPUT PANEL ************************ */
+	/******************************************* HANDLE CODE OUTPUT PANEL *******************************************/
 	const outputPanel = () => {
 		if (language === "python") {
 			return (
@@ -196,21 +128,58 @@ export function DevelopmentPage({language}) {
 			)
 		}else if (language === "html") {
 			return (
-				<HtmlRenderer code={debouncedCode} className={"bg-dark"} />
+				<HtmlRenderer code={code} className={"bg-dark"} />
 			)
 		}
 	}
-	/* ************************ HANDLE DEBOUNCING ************************ */
-	const [debouncedCode, setDebouncedCode] = useState(code);
-	const updateDebouncedCode = useCallback(debounce(setDebouncedCode, 500), []);
-	// Use an effect to update the debounced HTML when the HTML changes
-	useEffect(() => {
-		console.log('useEffect triggered');
-		updateDebouncedCode(code);
-	}, [code, updateDebouncedCode]);
 
+	/************************************** HANDLE OPENING AND CLOSING FILES **************************************/
+	async function getFileContent(s3_key) {
+		const response = await fetch('http://localhost:3002/get-file/?s3_key=' + encodeURIComponent(s3_key));
+		return response.text();
+	}
+	const [files, setFiles] = useState(projectFiles);  // only used to save file changes in state
+	useEffect(() => {
+		setFiles(projectFiles);
+	}, [projectFiles]);
+	async function openFile(fileName) {
+		setFiles((prevFiles) => {
+			// If the file is already opened before, just set isOpen to true
+			if (fileName in prevFiles && 'content' in prevFiles[fileName]) {
+				if (prevFiles[fileName].isOpen === true) {
+					return prevFiles;
+				}
+				// Note: never update state directly, always return a new object (can lead to weird bugs)
+				return {
+					...prevFiles,
+					[fileName]: {
+						...prevFiles[fileName],
+						isOpen: true,
+					}
+				}
+			} else {
+				// If the file content hasn't been loaded before, get it now
+				// Note: This is an async operation, but we can't wait for it (state updates are synchronous)
+				getFileContent(prevFiles[fileName].s3_key).then((content) => {
+					setFiles({
+						...prevFiles,
+						[fileName]: {
+							...prevFiles[fileName],
+							content: content,
+							isOpen: true,
+						},
+					});
+				});
+				// Return previous state immediately
+				return prevFiles;
+			}
+		});
+	}
+
+	// TODO if new file is added, add new object to files and set to open
 	return (
-		<Wrapper css={{ height: "100vh" }}>
+		<div className={'wrapper'} >
+			<Sidebar style={{overflow: "hidden"}} openFile={openFile} projectTree={projectTree} ></Sidebar>
 			<PromptBox
 				isVisible={promptBoxVisible}
 				onSubmit={handlePromptSubmit}
@@ -219,16 +188,19 @@ export function DevelopmentPage({language}) {
 			<Panel id={"code-mirror-container"} width={panelWidths.leftWidth} >
 				{showMenu && (
 					<ContextMenu menuPosition={menuPosition} setPromptBoxVisible={setPromptBoxVisible}
-					onClick={() => setShowMenu(false)} setShowMenu={setShowMenu} showMenu={showMenu}/>
+								 onClick={() => setShowMenu(false)} setShowMenu={setShowMenu} showMenu={showMenu}/>
 				)}
-				<CodeEditor code={code} setCode={setCode} language={language} editorRef={editorRef}
-								handleContextMenu={handleContextMenu}
+				<TabbedEditor code={code} setCode={setCode} language={language} editorRef={editorRef}
+							  handleContextMenu={handleContextMenu} files={files} setFiles={setFiles} userId={userId}
+							  projectId={projectId} projectTree={projectTree}
 				/>
 			</Panel>
 			<Divider onMouseDown={onMouseDown} />
 			<Panel width={panelWidths.rightWidth}>
 				{outputPanel()}
 			</Panel>
-		</Wrapper>
+		</div>
 	);
 }
+
+

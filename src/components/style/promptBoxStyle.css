@@ -1,0 +1,32 @@
+#promptBox{
+    position: fixed;
+    top: 10%;
+    right: 10%;
+    width: 30%;
+    z-index: 1000;
+    font-family: Noto Sans, sans-serif;
+    opacity: 1;
+    color: white;
+    background-color: #343a40;
+    padding: 10px;
+    border-radius: 8px;
+}
+#promptText {
+    width: 100%;
+    height: auto;
+    min-height: 50px;
+    max-height: 50vh;
+    resize: none;
+    overflow: auto;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    font-family: Noto Sans, sans-serif;
+    color: black;
+}
+#cancel {
+    color: black;
+}
+#toast-footer {
+    float: left;
+}
