@@ -1,2 +1,2 @@
-# Web-Based Code Editor with LLM coding assistant
+# Web-Based Code Editor
 - Under development
