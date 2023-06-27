@@ -29,8 +29,6 @@ dev/
 /src/setupTests.js
 /src/logo.svg
 /src/App.test.js
-/src/assets
-/assets
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

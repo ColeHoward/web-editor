@@ -3,7 +3,6 @@ const { SSE } = require('sse.js');
 
 export async function chatGPT(prompt, context, onChunk) {
     const url = `http://localhost:3001/chat?prompt=${encodeURIComponent(prompt)}&context=${encodeURIComponent(context)}`;
-
     try {
         const source = new SSE(url);
 

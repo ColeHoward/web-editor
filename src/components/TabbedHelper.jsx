@@ -32,7 +32,10 @@ const TabbedHelper = ({ setCode, language, files, setFiles, code }) => {
 				borderBottom: 1,
 				borderColor: "divider",
 				minHeight: "48px",
-				display:"block"
+				width: "97.5%",
+				display: "flex",
+				justifyContent: "space-around",
+				backgroundColor: "#1A1A1A"
 			}}>
 				<TabList onChange={(e, newTab) => setSelectedTab(newTab)}
 						 variant="fullWidth" scrollButtons="auto" sx={{
@@ -41,7 +44,7 @@ const TabbedHelper = ({ setCode, language, files, setFiles, code }) => {
 						height: "1px"
 					},
 					'& .Mui-selected': {
-						color: "#89CFEF"
+						color: "#89CFEF !important"
 					}
 				}}>
 					<Tab
@@ -59,10 +62,13 @@ const TabbedHelper = ({ setCode, language, files, setFiles, code }) => {
 				</TabList>
 			</Box>
 
-			<TabPanel value={selectedTab} style={{overflowY: "auto"}}>
-
+			<TabPanel value={selectedTab} style={{overflowY: "auto", backgroundColor: "#1A1A1A", display: "flex", justifyContent: "space-around"}}>
 				{selectedTab === "Run" && (
-					<SimpleBar style={{maxHeight: "calc(100vh - 48px)"}}>
+					<SimpleBar style={{
+						maxHeight: "calc(100vh - 48px)",
+						width: "calc(97.55%)",
+						padding: "0px",
+					}}>
 						{outputTab()}
 					</SimpleBar>
 				)}

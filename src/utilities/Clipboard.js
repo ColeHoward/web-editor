@@ -2,6 +2,7 @@ export const copyToClipboard = (textToCopy) => {
 	navigator.clipboard.writeText(textToCopy)
 		.then(() => {
 			console.log('Text copied to clipboard');
+			// TODO
 		})
 		.catch(err => {
 			console.error('Could not copy text: ', err);
@@ -11,6 +12,7 @@ export const copyToClipboard = (textToCopy) => {
 export const pasteFromClipboard = () => {
 	navigator.clipboard.readText()
 		.then(text => {
+			// TODO
 			console.log('Pasted text: ', text);
 		})
 		.catch(err => {
@@ -21,9 +23,8 @@ export const pasteFromClipboard = () => {
 export const cutToClipboard = (textToCut) => {
 	navigator.clipboard.writeText(textToCut)
 		.then(() => {
+			// TODO
 			console.log('Text cut to clipboard');
-			// After cut operation, the text should be removed from its source.
-			// Remove or replace the text from its source here.
 		})
 		.catch(err => {
 			console.error('Could not cut text: ', err);

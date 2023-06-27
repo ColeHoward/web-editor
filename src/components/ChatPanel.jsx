@@ -43,8 +43,8 @@ const ChatPanel = ({selectedText, messages, setMessages}) => {
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', alignItems: 'center', fontSize: "13px", padding: "0 0 10px 0",
-			justifyContent: "flex-start",}}>
-			<Box sx={{ display: 'block', flexDirection: 'column', height: `calc(90% - 26px - ${textAreaHeight}px)`, width: '97.5%', overflow: 'auto',
+			justifyContent: "flex-start", width: "97.5%"}}>
+			<Box sx={{ display: 'block', flexDirection: 'column', height: `calc(90% - 26px - ${textAreaHeight}px)`, width: '100%', overflow: 'auto',
 				p: 1, border: 1, borderColor: 'divider', borderRadius: 1, alignItems: "flex-start", padding: "10px 10px 10px 10px", justifyContent: "flex-start",
 				backgroundColor: "#1e1e1e", overflowY: "auto"}}>
 				{messages.map((message, index) => {
@@ -69,7 +69,7 @@ const ChatPanel = ({selectedText, messages, setMessages}) => {
 								} else {
 									codeBlockOpen = true;
 									return (
-										<Typography variant="body1" color= {message.from === 'user' ? "whitesmoke" : "whitesmoke"}
+										<Typography variant="body1" color="whitesmoke"
 													style={{
 														padding: "5px",
 														whiteSpace: 'pre-wrap',
@@ -89,7 +89,7 @@ const ChatPanel = ({selectedText, messages, setMessages}) => {
 			<Box component="form"
 				 onSubmit={event => { event.preventDefault(); handleSubmit(); }}
 				 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 2, justifyContent: "space-between", wordWrap: ""}}
-				 style={{backgroundColor: "#1e1e1e", padding: "10px 20px", borderRadius: "5px", width: '97.5%'}}
+				 style={{backgroundColor: "#1e1e1e", padding: "10px 20px", borderRadius: "5px", width: '100%'}}
 			>
 				<ResizableTextArea style={{marginRight: "10px", fontFamily: "Fira Code"}} numCols={70} returnHeight={setTextAreaHeight}
 								   inputValue={inputValue} setInputValue={setInputValue} handleSubmit={handleSubmit}/>
