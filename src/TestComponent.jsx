@@ -1,207 +1,117 @@
-// import React, { useState, useCallback, useRef, useEffect } from 'react';
-// import './components/style/tabbedStyle.css'
-// import './App.css';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import './pages/style/developmentPage.css'
-// import PythonConsole from "./components/PythonConsole";
-// import PromptBox from "./components/PromptBox";
-// import askGPT from "./utilities/api";
-// import ContextMenu from "./components/ContextMenu";
-// import CodeEditor from "./components/CodeEditor";
-// import {insertCode} from "./utilities/utils";
-// import {HtmlRenderer} from "./components/HtmlRenderer";
-// import {debounce} from "lodash";
-// import {Divider} from "./components/Divider";
-// import Panel from "./components/Panel";
-// import Sidebar from "./components/Sidebar";
-// import TabbedEditor from "./components/TabbedEditor";
-//
-//
-//
-// let testFiles = {
-//     "file.txt": {isOpen: true, content: "this is file 1\n\n\n", language: "python"},
-//     "file2.txt": {isOpen: true, content: "this is file 2\n\n\n", language: "python"},
-// };
-//
-//
-//
-// export function TestComponent({language}) {
-//
-//     /******************************************* HANDLE PANEL RESIZING *******************************************/
-//     const [panelWidths, setPanelWidths] = useState({leftWidth: (window.innerWidth-40) / 2,
-//         rightWidth: (window.innerWidth-40) / 2});
-//     // What am I using setCode for? I don't think I need it, unless for formatting or chatgpt
-//     const [code, setCode] = useState('');
-//
-//     const onMouseDown = useCallback((e) => {
-//         if (language === "html") {
-//             // put shield over iframe so resizing works
-//             const shield = document.createElement('div');
-//             shield.id = 'drag-shield';  // So you can find it later
-//             document.body.appendChild(shield);
-//         }
-//
-//         const onMove = (e) => {
-//             e.preventDefault() // prevent text selection when resizing
-//             const { movementX } = e;
-//             setPanelWidths((prevWidths) => {
-//                 const newLeftWidth = prevWidths.leftWidth + movementX;
-//                 const newRightWidth = prevWidths.rightWidth - movementX;
-//                 return { leftWidth: newLeftWidth, rightWidth: newRightWidth };
-//             });
-//         };
-//
-//         const onMouseUp = () => {
-//             window.removeEventListener('mousemove', onMove);
-//             window.removeEventListener('mouseup', onMouseUp);
-//             if (language === "html") {
-//                 const shield = document.getElementById('drag-shield');
-//                 if (shield) {
-//                     shield.remove();
-//                 }
-//             }
-//         };
-//
-//         window.addEventListener('mousemove', onMove);
-//         window.addEventListener('mouseup', onMouseUp);
-//     }, []);
-//
-//
-//     /******************************************* HANDLE CONTEXT MENU *******************************************/
-//     const [menuPosition, setMenuPosition] = useState({x: '0px', y: '0px'});
-//     const [showMenu, setShowMenu] = useState(false);
-//     const selectedText = useRef(''); // Using useRef
-//     const editorRef = useRef(null);
-//
-//     // TODO need to pass in which editor is being clicked
-//     const handleContextMenu = (event) => {
-//         console.log('in handle context menu')
-//         event.preventDefault();
-//
-//         if (editorRef.current) {
-//             console.log('editor not null')
-//             const editor = editorRef.current;
-//             const selection = editor.state.selection.main;
-//             const doc = editor.state.doc;
-//
-//             const low = Math.min(selection.from, selection.to)
-//             const high = Math.max(selection.from, selection.to)
-//             // Getting the selected text
-//             selectedText.current = doc.sliceString(low, high);
-//
-//             setMenuPosition({ x: `${event.pageX}px`, y: `${event.pageY}px` });
-//             setShowMenu(true);
-//         }else {
-//             console.log('editor is null')
-//         }
-//     };
-//
-//     /****************************************** HANDLE CHAT GPT SUPPORT *******************************************/
-//     const [promptBoxVisible, setPromptBoxVisible] = useState(false);
-//     const handleGPTRequest = async (prompt) => {
-//         let isFirstChunk = true;
-//         let originalSelection;
-//         if (editorRef.current) {
-//             originalSelection = editorRef.current.state.selection.main;
-//         }
-//         await askGPT(prompt, selectedText.current, async (chunk) => {
-//             if (editorRef.current) {
-//                 const editor = editorRef.current;
-//                 if (chunk !== "j7&c#0Y7*O$X@Iz6E59Ix") {
-//                     if (isFirstChunk) {
-//                         isFirstChunk = false;
-//                         originalSelection.to = insertCode(editor, chunk, true, originalSelection.from,
-//                             originalSelection.to);
-//                     } else {
-//                         originalSelection.from = originalSelection.to;
-//                         originalSelection.to = insertCode(editor, chunk, false, originalSelection.from);
-//                     }
-//                 }
-//             }
-//         })
-//         setPromptBoxVisible(false);
-//     };
-//     const handlePromptSubmit = (inputValue) => {
-//         handleGPTRequest(inputValue);
-//     };
-//
-//     const handlePromptCancel = () => {
-//         setPromptBoxVisible(false);
-//     };
-//
-//     /******************************************* HANDLE CODE OUTPUT PANEL *******************************************/
-//     const outputPanel = () => {
-//         if (language === "python") {
-//             return (
-//                 <PythonConsole pythonCode={code} className={"bg-dark"} />
-//             )
-//         }else if (language === "html") {
-//             return (
-//                 <HtmlRenderer code={debouncedCode} className={"bg-dark"} />
-//             )
-//         }
-//     }
-//
-//     /********************************************** HANDLE DEBOUNCING **********************************************/
-//     const [debouncedCode, setDebouncedCode] = useState(code);
-//     const updateDebouncedCode = useCallback(debounce(setDebouncedCode, 500), []);
-//     // Use an effect to update the debounced HTML when the HTML changes
-//     useEffect(() => {
-//         updateDebouncedCode(code);
-//     }, [code, updateDebouncedCode]);
-//
-//
-//     /************************************** HANDLE OPENING AND CLOSING FILES **************************************/
-//     const [files, setFiles] = useState(testFiles); // {fileName: {isOpen: Bool, content: String}}
-//
-//     // TODO on load, grab files from S3, set all to closed
-//
-//     // TODO if a file is clicked, set isOpen to true
-//     function openFile(fileName) {
-//         setFiles(prevFiles => {
-//             const newFiles = { ...prevFiles }; // Create a copy of the previous state
-//
-//             if (fileName in newFiles) {
-//                 newFiles["test"] = {isOpen: true, content: ''};
-//             } else {
-//                 newFiles["test"] = {isOpen: true, content: ''};
-//             }
-//
-//             return newFiles; // Return the updated copy
-//         });
-//     }
-//
-//
-//     // TODO if a tab is closed, set file object closed
-//
-//     // TODO if new file is added, add new object to files and set to open
-//
-//     // TODO if file is saved, save file to S3 and update files object
-//
-//
-//     return (
-//         <div className={'wrapper'} >
-//             <Sidebar style={{overflow: "hidden"}} openFile={openFile} ></Sidebar>
-//             <PromptBox
-//                 isVisible={promptBoxVisible}
-//                 onSubmit={handlePromptSubmit}
-//                 onCancel={handlePromptCancel}
-//             />
-//             <Panel id={"code-mirror-container"} width={panelWidths.leftWidth} >
-//                 {showMenu && (
-//                     <ContextMenu menuPosition={menuPosition} setPromptBoxVisible={setPromptBoxVisible}
-//                                  onClick={() => setShowMenu(false)} setShowMenu={setShowMenu} showMenu={showMenu}/>
-//                 )}
-//                 <TabbedEditor code={code} setCode={setCode} language={language} editorRef={editorRef}
-//                               handleContextMenu={handleContextMenu} files={files} setFiles={setFiles}
-//                 />
-//             </Panel>
-//             <Divider onMouseDown={onMouseDown} />
-//             <Panel width={panelWidths.rightWidth}>
-//                 {outputPanel()}
-//             </Panel>
-//         </div>
-//     );
-// }
-//
-//
+import './testComponentStyle.css';
+import React, {useRef, useState, useEffect} from 'react';
+import { TextField, Box, Button, Typography, Card } from '@mui/material';
+import {createTheme, ThemeProvider} from "@mui/material/styles";
+import ResizableTextArea from "./components/ResizableTextarea";
+import {borderRadius} from "@mui/system";
+import {ReactComponent as SendIcon} from "./assets/icons/send.svg";
+import SimpleBar from 'simplebar-react';
+import {chatGPT} from "./utilities/api";
+import CodeBlock from "./components/CodeBlock";
+
+const TestComponent = ({selectedText}) => {
+    const [messages, setMessages] = useState([]);
+    const [inputValue, setInputValue] = useState('');
+    const [textAreaHeight, setTextAreaHeight] = useState(20);
+
+
+    const handleSubmit =  () => {
+        // Don't submit if inputValue is only whitespace
+        if (!inputValue.trim()) return;
+
+        // Add a new message to the messages array.
+        setMessages(prevMessages => [...prevMessages, { text: inputValue.trim(), from: 'user' }]);
+        handleGPTRequest(inputValue.trim());
+        // Clear the input field.
+        setInputValue('');
+    }
+
+    /****************************************** HANDLE STANDARD CHAT W/GPT *******************************************/
+    const handleGPTRequest = async (prompt) => {
+        let gptMessageIndex = null;
+        await chatGPT(prompt, selectedText ?? "", async (chunk) => {
+            if (chunk !== "j7&c#0Y7*O$X@Iz6E59Ix") {
+                setMessages(prevMessages => {
+                    if(gptMessageIndex !== null && prevMessages[gptMessageIndex] && 'text' in prevMessages[gptMessageIndex]) {
+                        // If a 'gpt' message already exists, append the new chunk to it
+                        return prevMessages.map((message, index) =>
+                            index === gptMessageIndex ? {...message, text: message.text + chunk} : message);
+                    } else {
+                        // If there's no 'gpt' message, create a new one and keep track of its index
+                        const newMessage = { text: chunk, from: 'gpt' };
+                        gptMessageIndex = prevMessages.length;
+                        return [...prevMessages, newMessage];
+                    }
+                });
+            }
+        });
+    };
+
+
+
+
+
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', fontSize: "13px", padding: "10px"}}>
+            <Box sx={{ display: 'block', flexDirection: 'column', height: `calc(90% - 26px - ${textAreaHeight}px)`, width: 'calc(100%)', overflow: 'auto',
+                p: 1, border: 1, borderColor: 'divider', borderRadius: 1, alignItems: "flex-start", padding: "10px",
+                backgroundColor: "#1e1e1e", overflowY: "auto"}}>
+                {messages.map((message, index) => {
+                    const chunks = message.text.split("```");
+                    let codeBlockOpen = false;
+                    return (
+                        <Card variant="outlined"
+                              sx={{
+                                  bgcolor: message.from === 'user' ? '#1A1A1A;': '#1e1e1e',
+                                  width: "100%",
+                                  textAlign: "left",
+                                  padding: "5px 10px",
+                              }}>
+                            {chunks.map(chunk => {
+                                if (codeBlockOpen) {
+                                    codeBlockOpen = false;
+                                    const lines = chunk.split('\n');
+                                    const language = lines[0];  // The first line is the language
+                                    const code = lines.slice(1).join('\n');  // The rest is the code
+                                    return <CodeBlock language={language} code={code} />
+                                } else {
+                                    codeBlockOpen = true;
+                                    return (
+                                        <Typography variant="body1" color="whitesmoke"
+                                                    style={{
+                                                        padding: "5px",
+                                                        whiteSpace: 'pre-wrap',
+                                                        wordWrap: "break-word",
+                                                        fontSize: "15px",
+                                                        lineHeight: "1.7"
+                                                    }}>
+                                            {chunk}
+                                        </Typography>
+                                    );
+                                }
+                            })}
+                        </Card>
+                    );
+                })}
+
+
+            </Box>
+            <Box component="form"
+                 onSubmit={event => { event.preventDefault(); handleSubmit(); }}
+                 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 2, justifyContent: "space-between", wordWrap: ""}}
+                style={{backgroundColor: "#1e1e1e", padding: "10px 20px", borderRadius: "5px", width: 'calc(100% )'}}
+            >
+                <ResizableTextArea style={{marginRight: "10px", fontFamily: "Fira Code"}} numCols={70} returnHeight={setTextAreaHeight}
+                                   inputValue={inputValue} setInputValue={setInputValue} handleSubmit={handleSubmit}/>
+                <SendIcon type="submit" onClick={handleSubmit}
+                          style={{ color: "gray", width: "20px", height: "20px", flexGrow: "0", cursor: "pointer"}}
+                          title="Shift+Enter"/>
+            </Box>
+        </Box>
+    )
+}
+
+
+export default TestComponent;
+
+

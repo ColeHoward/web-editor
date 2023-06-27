@@ -13,16 +13,17 @@ import {Divider} from "../components/Divider";
 import Panel from "../components/Panel";
 import Sidebar from "../components/Sidebar";
 import TabbedEditor from "../components/TabbedEditor";
+import TestComponent from "../TestComponent";
+import ResizableTextArea from "../components/ResizableTextarea";
 
 
 export function DevelopmentPage({language, userId, projectId, projectFiles, setProjectFiles, projectTree}) {
 
 	/******************************************* HANDLE PANEL RESIZING *******************************************/
 	const [panelWidths, setPanelWidths] = useState({
-			leftWidth: (window.innerWidth-40) / 2, // -40 to account for tab height
+			leftWidth: (window.innerWidth-40) / 2, // -40 to account for sidebar
 			rightWidth: (window.innerWidth-40) / 2
 	});
-	// What am I using setCode for? I don't think I need it, unless for formatting or chatgpt
 	const [code, setCode] = useState('');
 
 	const onMouseDown = useCallback((e) => {
@@ -124,7 +125,9 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 	const outputPanel = () => {
 		if (language === "python") {
 			return (
-				<PythonConsole pythonCode={code} className={"bg-dark"} />
+				// <PythonConsole pythonCode={code} className={"bg-dark"} />
+				<TestComponent />
+				// <ResizableTextArea />
 			)
 		}else if (language === "html") {
 			return (

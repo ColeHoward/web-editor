@@ -16,7 +16,6 @@ function PythonConsole({ pythonCode }) {
 		const url = `http://127.0.0.1:5000/execute`;
 
 		try {
-			console.log('Running Python code...', pythonCode)
 			const source = new SSE(url, {
 				method: 'POST',
 				headers: {
@@ -31,11 +30,7 @@ function PythonConsole({ pythonCode }) {
 
 			source.addEventListener('message', function(e) {
 				// Append the new output to the console output
-
 				setConsoleOutput((prevOutput) => {
-					console.log('e.data', e.data)
-					console.log('prevOutput', prevOutput)
-
 					return prevOutput + JSON.parse(e.data)
 				});
 			});

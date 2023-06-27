@@ -35,9 +35,7 @@ const upload = multer({
         }
     })
 });
-// Cole/testProject/src/test.py
-// Cole/testProject/src/test.py
-// project#testProject_path#src/test.py
+
 // this will either create a new file or update an existing one
 app.post('/put-file', upload.single('file'), async function (req, res, next) {
     const codeString = req.body.code;  // not storing on DynamoDB, only S3
@@ -48,7 +46,7 @@ app.post('/put-file', upload.single('file'), async function (req, res, next) {
     const type = req.body.type  // file or directory; not really necessary b/c only upload files
     // const projectType = req.body.projectType // e.g. html, js, python, etc., could maybe just append to project name
 
-    /************************** STORE PROJECTS WITH FLATTENED HIERARCHICAL STRUCTURE ON S3 **************************/
+    /*********************************************** STORE FILES ON S3 ***********************************************/
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         Key: `${userId}/${projectId}/${filename}`,
@@ -64,7 +62,7 @@ app.post('/put-file', upload.single('file'), async function (req, res, next) {
         return;
     }
 
-    /*************************************** UPLOAD METADATA TO DYNAMODB ***************************************/
+    /*********************** STORE METADATA WITH FLATTENED HIERARCHICAL STRUCTURE  ON DYNAMODB ***********************/
     const dbParams = {
         TableName: process.env.DYNAMODB_TABLE_NAME,
         Item: {
@@ -90,8 +88,8 @@ app.post('/put-file', upload.single('file'), async function (req, res, next) {
 
 // should have authentication in production (so someone that gets their userId can't see all their projects)
 app.get('/get-project-metadata', async function(req, res, next) {
-    const userId = req.query.userId;  // Get userId from the query params
-    const projectId = req.query.projectId;  // Get projectId from the query params
+    const userId = req.query.userId;
+    const projectId = req.query.projectId;
 
     const dbParams = {
         TableName: process.env.DYNAMODB_TABLE_NAME,
@@ -118,54 +116,6 @@ app.get('/get-project-metadata', async function(req, res, next) {
     }
 });
 
-// return the files instead of the file links
-// app.get('/get-project-files', async function(req, res, next) {
-//     const userId = req.query.userId;  // Get userId from the query params
-//     const projectId = req.query.projectId;  // Get projectId from the query params
-//
-//     const dbParams = {
-//         TableName: process.env.DYNAMODB_TABLE_NAME,
-//         KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk_prefix)',
-//         ExpressionAttributeValues: {
-//             ':pk': `user#${userId}`,
-//             ':sk_prefix': `project#${projectId}_file#`,
-//         },
-//     };
-//
-//     let dynamoResponse;
-//     try {
-//         dynamoResponse = await dynamoDb.query(dbParams).promise();
-//         console.log('DynamoDB Response:', dynamoResponse);
-//     } catch (error) {
-//         console.error('Error querying DynamoDB:', error);
-//         res.status(500).send(error);
-//         return;
-//     }
-//
-//     // Get the actual file from S3 using the file links or S3 keys
-//     let files = await Promise.all(dynamoResponse.Items.map(async (item) => {
-//         const params = {
-//             Bucket: process.env.AWS_S3_BUCKET_NAME,
-//             Key: item.s3_key,
-//         };
-//
-//         try {
-//             let s3File = await s3.getObject(params).promise();
-//             console.log('S3 File:', s3File);
-//
-//             // Return a new object containing both metadata from DynamoDB and actual file from S3
-//             return {
-//                 ...item,
-//                 file: s3File.Body.toString(),  // Convert file content to string assuming it's text
-//             };
-//         } catch (error) {
-//             console.error('Error getting file from S3:', error);
-//             throw error;  // If one file fails to load from S3, it will stop the whole operation
-//         }
-//     }));
-//
-//     res.send({ files });
-// });\
 app.get('/get-file', async function(req, res, next) {
     const s3_key = req.query.s3_key;  // Get s3_key from the query params
 

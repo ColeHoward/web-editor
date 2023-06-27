@@ -16,8 +16,8 @@ import { GlobalStyles } from '@mui/system';
 const FileTree = ({ fileTree, minWidth = 100, maxWidth = 300 , openFile}) => {
 	const [width, setWidth] = useState(minWidth);
 	const [isResizing, setIsResizing] = useState(false);
-	// TODO on app loading, get file tree from S3
-	// Recursive function to generate file tree
+
+	// Recursively generate file tree
 	const renderTree = useCallback((node, path = '') => {
 		let newPath;
 		if (path === '') {

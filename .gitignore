@@ -24,6 +24,12 @@
 /backend/main
 /backend/main.go
 /src/dev
+dev/
+/src/reportWebVitals.js
+/src/setupTests.js
+/src/logo.svg
+/src/App.test.js
+/src/assets
 
 npm-debug.log*
 yarn-debug.log*

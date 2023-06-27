@@ -4,14 +4,10 @@ import { python } from "@codemirror/lang-python";
 import { html } from "@codemirror/lang-html";
 import {vscodeDark} from "@uiw/codemirror-theme-vscode"
 import './style/codeEditorStyle.css'
-import SimpleBar from 'simplebar-react';
 // ...
 
 let languageObjs = {"python": python, "html": html}
 
-function test(event){
-	console.log(event)
-}
 function CodeEditor({code, setCode, language, editorRef, handleContextMenu}) {
 	const cm = useRef(null);
 	useEffect(() => {

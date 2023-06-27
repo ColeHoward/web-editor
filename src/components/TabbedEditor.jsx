@@ -3,14 +3,13 @@ import {Tab, Box } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabList from '@mui/lab/TabList';
 import TabContext from '@mui/lab/TabContext';
-import CodeEditor from './CodeEditor';  // Import your CodeEditor here
+import CodeEditor from './CodeEditor';
 import {ReactComponent as CloseIcon} from '../assets/icons/close.svg'
 import SimpleBar from 'simplebar-react';
 
 
-// File object structure: {id, name, content, language}
-const TabbedEditor = ({ code, setCode, language, editorRef, files, setFiles, handleContextMenu }) => {
-	const [selectedTab, setSelectedTab] = useState("");
+const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleContextMenu }) => {
+	const [selectedTab, setSelectedTab] = useState();
 	useEffect(() => {
 		const openFile = Object.keys(files).find(fileName => files[fileName].isOpen);
 		setSelectedTab(openFile || "");
@@ -36,11 +35,6 @@ const TabbedEditor = ({ code, setCode, language, editorRef, files, setFiles, han
 		},
 		[selectedTab, setFiles, setCode]
 	);
-
-	const handleTabChange = (event, newValue) => {
-		setSelectedTab(newValue);
-	};
-
 	const closeTab = useCallback(
 		fileName => {
 			setFiles(prevFiles => ({
@@ -54,52 +48,63 @@ const TabbedEditor = ({ code, setCode, language, editorRef, files, setFiles, han
 		[setFiles]
 	);
 
-	// TODO need to have variable in DevelopmentPage to not show this component when no tabs are open
 	const areAnyFilesOpen = Object.values(files).some(file => file.isOpen);
 	return (
 		<TabContext value={selectedTab}>
-			<Box sx={{ borderBottom: 1, borderColor: "divider", minHeight: "48px", display: areAnyFilesOpen ? 'block' : 'none' }}>
-				<TabList onChange={handleTabChange} variant="standard" scrollButtons="auto" sx={{
-					'& .MuiTabs-indicator': {
-						backgroundColor: '#89CFEF'
-					}
-				}}>
-					{Object.keys(files)
-						.filter(fileName => {return (fileName in files && files[fileName].isOpen)})
-						.map(fileName => (
-							<Tab
-								label={
-									<div style={{ display: "flex", color: 'gray', alignItems: "center" }}>
-										{fileName !== "" ? fileName.substring(fileName.lastIndexOf('/') + 1) : fileName}
-										<CloseIcon
-											style={{ height: "11px" }}
-											onClick={event => {
-												event.stopPropagation();
-												closeTab(fileName);
-											}}
-										/>
-									</div>
-								}
-								value={fileName}
-								key={fileName}
-								sx={{ textTransform: 'none', fontSize: '12px' }}
-							/>
-						))}
-				</TabList>
-			</Box>
 			{areAnyFilesOpen && (
-				<TabPanel value={selectedTab} style={{ overflowY: "auto" }} >
-					<SimpleBar style={{ maxHeight: "calc(100vh - 48px)" }}>
-						<CodeEditor
-							language={language}
-							code={files[selectedTab]?.content || ""}
-							setCode={handleCodeChange}
-							editorRef={editorRef}
-							handleContextMenu={handleContextMenu}
-						/>
-					</SimpleBar>
-				</TabPanel>
+				<>
+					<Box sx={{
+						borderBottom: 1,
+						borderColor: "divider",
+						minHeight: "48px",
+						display: areAnyFilesOpen ? 'block' : 'none'
+					}}>
+						<TabList onChange={(e, newTab) => setSelectedTab(newTab)}
+						 variant="standard" scrollButtons="auto" sx={{
+							'& .MuiTabs-indicator': {
+								backgroundColor: '#89CFEF'
+							}
+						}}>
+							{Object.keys(files)
+								.filter(fileName => {
+									return (fileName in files && files[fileName].isOpen)
+								})
+								.map(fileName => (
+									<Tab
+										label={
+											<div style={{display: "flex", color: 'gray', alignItems: "center"}}>
+												{fileName !== "" ? fileName.substring(fileName.lastIndexOf('/') + 1) : fileName}
+												<CloseIcon
+													style={{height: "11px"}}
+													onClick={event => {
+														event.stopPropagation();
+														closeTab(fileName);
+													}}
+												/>
+											</div>
+										}
+										value={fileName}
+										key={fileName}
+										sx={{textTransform: 'none', fontSize: '12px'}}
+									/>
+								))}
+						</TabList>
+					</Box>
+
+					<TabPanel value={selectedTab} style={{overflowY: "auto"}}>
+						<SimpleBar style={{maxHeight: "calc(100vh - 48px)"}}>
+							<CodeEditor
+								language={language}
+								code={files[selectedTab]?.content || ""}
+								setCode={handleCodeChange}
+								editorRef={editorRef}
+								handleContextMenu={handleContextMenu}
+							/>
+						</SimpleBar>
+					</TabPanel>
+				</>
 			)}
+
 		</TabContext>
 	);
 };
