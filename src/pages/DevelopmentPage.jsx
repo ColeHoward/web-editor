@@ -15,6 +15,7 @@ import Sidebar from "../components/Sidebar";
 import TabbedEditor from "../components/TabbedEditor";
 import TestComponent from "../TestComponent";
 import ResizableTextArea from "../components/ResizableTextarea";
+import TabbedHelper from "../components/TabbedHelper";
 
 
 export function DevelopmentPage({language, userId, projectId, projectFiles, setProjectFiles, projectTree}) {
@@ -121,21 +122,6 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 		setPromptBoxVisible(false);
 	};
 
-	/******************************************* HANDLE CODE OUTPUT PANEL *******************************************/
-	const outputPanel = () => {
-		if (language === "python") {
-			return (
-				// <PythonConsole pythonCode={code} className={"bg-dark"} />
-				<TestComponent />
-				// <ResizableTextArea />
-			)
-		}else if (language === "html") {
-			return (
-				<HtmlRenderer code={code} className={"bg-dark"} />
-			)
-		}
-	}
-
 	/************************************** HANDLE OPENING AND CLOSING FILES **************************************/
 	async function getFileContent(s3_key) {
 		const response = await fetch('http://localhost:3002/get-file/?s3_key=' + encodeURIComponent(s3_key));
@@ -198,9 +184,9 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 							  projectId={projectId} projectTree={projectTree}
 				/>
 			</Panel>
-			<Divider onMouseDown={onMouseDown} />
+			<Divider onMouseDown={onMouseDown} style={{margin: "0 auto"}} />
 			<Panel width={panelWidths.rightWidth}>
-				{outputPanel()}
+				<TabbedHelper language={language} code={code}/>
 			</Panel>
 		</div>
 	);

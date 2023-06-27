@@ -41,3 +41,21 @@
 .ͼ1 .cm-content[contenteditable=true] {
   text-align: left !important;
 }
+@font-face {
+  font-family: 'spacemono';
+  src: url('./assets/fonts/spacemono/SpaceMono-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('./assets/fonts/Noto_Sans/NotoSans-Regular.ttf') format('truetype');
+}
+/* add consolas font */
+@font-face {
+  font-family: 'consolas';
+  src: url('./assets/fonts/consolas/Consolas.ttf') format('truetype');
+}
+@font-face {
+  font-family: "Fira Code";
+  src: url("./assets/fonts/Fira_Code/static/FiraCode-Regular.ttf") format("truetype");
+}

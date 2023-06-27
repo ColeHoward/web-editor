@@ -1,23 +1,9 @@
-/*add spacemono font family and noto sans font family*/
-@font-face {
-  font-family: 'spacemono';
-  src: url('./assets/fonts/spacemono/SpaceMono-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Noto Sans';
-  src: url('./assets/fonts/Noto_Sans/NotoSans-Regular.ttf') format('truetype');
-}
-/* add consolas font */
-@font-face {
-  font-family: 'consolas';
-  src: url('./assets/fonts/consolas/Consolas.ttf') format('truetype');
-}
-@font-face {
-  font-family: "Fira Code";
-  src: url("./assets/fonts/Fira_Code/static/FiraCode-Regular.ttf") format("truetype");
-}
-
-.prompt-area:focus {
-    outline: none;
-}
+/*.css-1be53c {*/
+/*    justify-content: flex-start !important;*/
+/*}*/
+/*MuiBox-root css-1be53c {*/
+/*    padding-top: 0 !important;*/
+/*}*/
+/*MuiBox-root css-1xd2pfn {*/
+/*    justify-content: flex-start !important;*/
+/*}*/

@@ -8,7 +8,7 @@ import 'prismjs/components/prism-python';
 import { useEffect, useState } from 'react';
 import {CopyIcon} from './icons/CopyIcon';
 const CodeBlock = ({ language, code }) => {
-
+	const [isCopied, setIsCopied] = useState(false);
 	useEffect(() => {
 		Prism.highlightAll();
 	}, [code]);
@@ -17,6 +17,8 @@ const CodeBlock = ({ language, code }) => {
 		try {
 			// Copy code to clipboard
 			await navigator.clipboard.writeText(code);
+			setIsCopied(true);
+			setTimeout(() => setIsCopied(false), 1000);
 			// Set isCopied to true
 		} catch (err) {
 			console.error('Failed to copy text: ', err);
@@ -24,24 +26,32 @@ const CodeBlock = ({ language, code }) => {
 	};
 
 	return (
-		<pre style={{border: "none", backgroundColor: "transparent", position: "relative", margin: 0, paddingTop: 0, paddingBottom: 0}}>
-            {/* Copy Button */}
-			<CopyIcon handleCopy={handleCopy}
-					  style={{
-						  position: "absolute",
-						  top: "10px",
-						  right: "30px",
-						  width: "20px",
-						  height: "20px",
-						  cursor: "pointer",
-						  fontFamily: "consolas, monospace",
-					}}
-					  />
-			{/* Code */}
-			<code className={`language-${language}`} style={{fontSize: "15px"}}>
-                {code}
-            </code>
-        </pre>
+		<div id={"code-block-wrapper"} style={{border: "2px solid #ffffff0f", borderRadius: "5px", paddingBottom: "10px"}}>
+			<div id={"codeblock-header"} style={{display: "flex", justifyContent: "space-between", padding: "5px 10px",
+				alignItems: "center", width: "100%", height: "28px", backgroundColor: "#ffffff0f", lineHeight: "25px",
+				fontSize: "12px", marginBottom: "10px", borderRadius: "2px 2px 0 0"}}>
+				<span style={{display: "block", color: "whitesmoke"}}>{language}</span>
+				<div onClick={() => handleCopy()}
+					style={{width: "calc(20px + 9ch + 5px)", display: "flex", justifyContent: "flex-end",
+						alignItems: "center", cursor: "pointer"}}>
+					<CopyIcon color={isCopied ? "#61dafb" : "gray"}
+							  style={{
+								  width: "16px",
+								  height: "16px",
+								  cursor: "pointer",
+								  fontFamily: "consolas, monospace",
+								  marginRight: "5px"
+							  }}
+					/>
+					<span style={{display: "block", color: isCopied ? "#61dafb" : "whitesmoke"}}>Copy code</span>
+				</div>
+			</div>
+			<pre style={{border: "none", backgroundColor: "transparent", position: "relative", margin: 0, paddingTop: 0, paddingBottom: 0}}>
+				<code className={`language-${language}`} style={{fontSize: "15px"}}>
+					{code}
+				</code>
+			</pre>
+		</div>
 	);
 }
 

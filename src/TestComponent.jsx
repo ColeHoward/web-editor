@@ -1,116 +1,70 @@
-import './testComponentStyle.css';
-import React, {useRef, useState, useEffect} from 'react';
-import { TextField, Box, Button, Typography, Card } from '@mui/material';
-import {createTheme, ThemeProvider} from "@mui/material/styles";
-import ResizableTextArea from "./components/ResizableTextarea";
-import {borderRadius} from "@mui/system";
-import {ReactComponent as SendIcon} from "./assets/icons/send.svg";
+import React, { useState } from 'react';
+import {Tab, Box } from '@mui/material';
+import TabPanel from '@mui/lab/TabPanel';
+import TabList from '@mui/lab/TabList';
+import TabContext from '@mui/lab/TabContext';
 import SimpleBar from 'simplebar-react';
-import {chatGPT} from "./utilities/api";
-import CodeBlock from "./components/CodeBlock";
+import PythonConsole from "./components/PythonConsole";
+import ChatPanel from "./components/ChatPanel";
+import './testComponentStyle.css'
 
-const TestComponent = ({selectedText}) => {
+
+const TestComponent = ({ setCode, language, files, setFiles, code }) => {
+    const [selectedTab, setSelectedTab] = useState("Console");
+    // const areAnyFilesOpen = Object.values(files).some(file => file.isOpen);
     const [messages, setMessages] = useState([]);
-    const [inputValue, setInputValue] = useState('');
-    const [textAreaHeight, setTextAreaHeight] = useState(20);
-
-
-    const handleSubmit =  () => {
-        // Don't submit if inputValue is only whitespace
-        if (!inputValue.trim()) return;
-
-        // Add a new message to the messages array.
-        setMessages(prevMessages => [...prevMessages, { text: inputValue.trim(), from: 'user' }]);
-        handleGPTRequest(inputValue.trim());
-        // Clear the input field.
-        setInputValue('');
-    }
-
-    /****************************************** HANDLE STANDARD CHAT W/GPT *******************************************/
-    const handleGPTRequest = async (prompt) => {
-        let gptMessageIndex = null;
-        await chatGPT(prompt, selectedText ?? "", async (chunk) => {
-            if (chunk !== "j7&c#0Y7*O$X@Iz6E59Ix") {
-                setMessages(prevMessages => {
-                    if(gptMessageIndex !== null && prevMessages[gptMessageIndex] && 'text' in prevMessages[gptMessageIndex]) {
-                        // If a 'gpt' message already exists, append the new chunk to it
-                        return prevMessages.map((message, index) =>
-                            index === gptMessageIndex ? {...message, text: message.text + chunk} : message);
-                    } else {
-                        // If there's no 'gpt' message, create a new one and keep track of its index
-                        const newMessage = { text: chunk, from: 'gpt' };
-                        gptMessageIndex = prevMessages.length;
-                        return [...prevMessages, newMessage];
-                    }
-                });
-            }
-        });
-    };
-
-
-
-
+    const [consoleOutput, setConsoleOutput] = useState("");
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', justifyContent: 'center', alignItems: 'center', fontSize: "13px", padding: "10px"}}>
-            <Box sx={{ display: 'block', flexDirection: 'column', height: `calc(90% - 26px - ${textAreaHeight}px)`, width: 'calc(100%)', overflow: 'auto',
-                p: 1, border: 1, borderColor: 'divider', borderRadius: 1, alignItems: "flex-start", padding: "10px",
-                backgroundColor: "#1e1e1e", overflowY: "auto"}}>
-                {messages.map((message, index) => {
-                    const chunks = message.text.split("```");
-                    let codeBlockOpen = false;
-                    return (
-                        <Card variant="outlined"
-                              sx={{
-                                  bgcolor: message.from === 'user' ? '#1A1A1A;': '#1e1e1e',
-                                  width: "100%",
-                                  textAlign: "left",
-                                  padding: "5px 10px",
-                              }}>
-                            {chunks.map(chunk => {
-                                if (codeBlockOpen) {
-                                    codeBlockOpen = false;
-                                    const lines = chunk.split('\n');
-                                    const language = lines[0];  // The first line is the language
-                                    const code = lines.slice(1).join('\n');  // The rest is the code
-                                    return <CodeBlock language={language} code={code} />
-                                } else {
-                                    codeBlockOpen = true;
-                                    return (
-                                        <Typography variant="body1" color="whitesmoke"
-                                                    style={{
-                                                        padding: "5px",
-                                                        whiteSpace: 'pre-wrap',
-                                                        wordWrap: "break-word",
-                                                        fontSize: "15px",
-                                                        lineHeight: "1.7"
-                                                    }}>
-                                            {chunk}
-                                        </Typography>
-                                    );
-                                }
-                            })}
-                        </Card>
-                    );
-                })}
+        <TabContext value={selectedTab}>
+                <Box sx={{
+                    borderBottom: 1,
+                    borderColor: "divider",
+                    minHeight: "48px",
+                    display:"block"
+                }}>
+                    <TabList onChange={(e, newTab) => setSelectedTab(newTab)}
+                             variant="fullWidth" scrollButtons="auto" sx={{
+                        '& .MuiTabs-indicator': {
+                            backgroundColor: 'gray',
+                            height: "1px"
+                        },
+                        '& .Mui-selected': {
+                            color: "gray"
+                        }
+                    }}>
+                        <Tab
+                            label={"Console"}
+                            value={"Console"}
+                            key={"Console"}
+                            sx={{textTransform: 'none', fontSize: '12px', color: "gray"}}
+                        />
+                        <Tab
+                            label={"Chat"}
+                            value={"Chat"}
+                            key={"Chat"}
+                            sx={{textTransform: 'none', fontSize: '12px', color: "gray"}}
+                        />
+                    </TabList>
+                </Box>
+
+                <TabPanel value={selectedTab} style={{overflowY: "auto"}}>
+                        {selectedTab === "Console" && (
+                            <SimpleBar style={{maxHeight: "calc(100vh - 48px)"}}>
+                                <PythonConsole language={language} pythonCode={code} consoleOutput={consoleOutput}
+                                    setConsoleOutput={setConsoleOutput}
+                                />
+                            </SimpleBar>
+                        )}
+                        {selectedTab === "Chat" && (
+                            <ChatPanel messages={messages} setMessages={setMessages} />
+                        )}
 
 
-            </Box>
-            <Box component="form"
-                 onSubmit={event => { event.preventDefault(); handleSubmit(); }}
-                 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 2, justifyContent: "space-between", wordWrap: ""}}
-                style={{backgroundColor: "#1e1e1e", padding: "10px 20px", borderRadius: "5px", width: 'calc(100% )'}}
-            >
-                <ResizableTextArea style={{marginRight: "10px", fontFamily: "Fira Code"}} numCols={70} returnHeight={setTextAreaHeight}
-                                   inputValue={inputValue} setInputValue={setInputValue} handleSubmit={handleSubmit}/>
-                <SendIcon type="submit" onClick={handleSubmit}
-                          style={{ color: "gray", width: "20px", height: "20px", flexGrow: "0", cursor: "pointer"}}
-                          title="Shift+Enter"/>
-            </Box>
-        </Box>
-    )
-}
-
+                </TabPanel>
+        </TabContext>
+    );
+};
 
 export default TestComponent;
 

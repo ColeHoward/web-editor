@@ -1,17 +1,11 @@
 import {useState} from "react";
 
-export const CopyIcon = ({color, style, handleCopy}) => {
-	const [isCopied, setIsCopied] = useState(false);
-	const copyCode = async () => {
-		setIsCopied(true);
-		handleCopy();
-		setTimeout(() => setIsCopied(false), 1000);
-	}
+export const CopyIcon = ({color, style}) => {
 	return (
-		<svg  onClick={() => copyCode()}  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style={{
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style={{
 			width: "20px",
 			height: "20px",
-			fill: isCopied ? "#61dafb" : "gray",
+			fill: color,
 			...style
 		}}>
 			<path d="M448 384H256c-35.3 0-64-28.7-64-64V64c0-35.3 28.7-64 64-64H396.1c12.7 0 24.9 5.1 33.9 14.1l67.9

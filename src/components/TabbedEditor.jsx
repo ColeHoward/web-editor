@@ -62,7 +62,8 @@ const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleCon
 						<TabList onChange={(e, newTab) => setSelectedTab(newTab)}
 						 variant="standard" scrollButtons="auto" sx={{
 							'& .MuiTabs-indicator': {
-								backgroundColor: '#89CFEF'
+								backgroundColor: '#89CFEF',
+								height: "1px"
 							}
 						}}>
 							{Object.keys(files)

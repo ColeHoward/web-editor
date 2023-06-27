@@ -7,9 +7,9 @@ import stopIcon from  '../assets/icons/stop.svg';
 const { SSE } = require('sse.js');
 
 
-function PythonConsole({ pythonCode }) {
-	const [consoleOutput, setConsoleOutput] = useState('');
+function PythonConsole({ pythonCode, consoleOutput, setConsoleOutput }) {
 	const runPythonCode = () => {
+		if (!pythonCode.trim()) return;
 		// Reset console output
 		setConsoleOutput('');
 
@@ -46,11 +46,11 @@ function PythonConsole({ pythonCode }) {
 	};
 
 	return (
-		<Card style={{ height: '100%',width: "100%", overflow: 'auto' }} className={"bg-dark text-light"} id={"pythonConsole"}>
-			<Card.Header style={{width: "100%"}}>
+		<Card style={{ height: '100%',width: "100%", overflow: 'auto', padding: "10px 5p" }} className={"bg-dark text-light"} id={"pythonConsole"}>
+			<Card.Header style={{width: "100%", height: "35px", display: "flex", justifyContent: "flex-start", alignItems: "center"}}>
 				<img src={playIcon} alt="play" onClick={runPythonCode}
-					 style={{width: "20px", height: "20px", float: "left", margin: "5px 10px 0px 10px", cursor: "pointer"}} />
-				<img src={stopIcon} alt="stop" style={{width: "20px", height: "20px", float: "left", marginTop: "5px"}} />
+					 style={{width: "20px", height: "20px", cursor: "pointer", margin: "0 10px"}} />
+				<img src={stopIcon} alt="stop" style={{width: "20px", height: "20px"}} />
 			</Card.Header>
 			<Card.Body style={{ textAlign: 'left', width: "100%", float: "left", backgroundColor: "#1A1A1A" }}>  {/* Add this line */}
 				<pre style={{ whiteSpace: 'pre', height: "100%", width: "100%", backgroundColor: "#1A1A1A", border: "none", color: "mediumpurple"  }}>{consoleOutput}</pre>
