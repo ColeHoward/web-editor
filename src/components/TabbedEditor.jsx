@@ -9,11 +9,19 @@ import SimpleBar from 'simplebar-react';
 
 
 const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleContextMenu }) => {
-	const [selectedTab, setSelectedTab] = useState();
+	const [selectedTab, setSelectedTab] = useState(null);
+	const [openTabs, setOpenTabs] = useState(Object.keys(files).filter(fileName => files[fileName].isOpen));
+
 	useEffect(() => {
-		const openFile = Object.keys(files).find(fileName => files[fileName].isOpen);
-		setSelectedTab(openFile || "");
-	}, [files, setSelectedTab]);
+		setOpenTabs(Object.keys(files).filter(fileName => files[fileName].isOpen));
+	}, [files]);
+
+	useEffect(() => {
+		if (!openTabs.includes(selectedTab)) {
+			const firstOpenTab = openTabs[0];
+			setSelectedTab(firstOpenTab || null);
+		}
+	}, [openTabs, selectedTab]);
 
 	useEffect(() => {
 		const currentFile = files[selectedTab];
@@ -35,8 +43,7 @@ const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleCon
 		},
 		[selectedTab, setFiles, setCode]
 	);
-	const closeTab = useCallback(
-		fileName => {
+	const closeTab = ((fileName) => {
 			setFiles(prevFiles => ({
 				...prevFiles,
 				[fileName]: {
@@ -44,23 +51,32 @@ const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleCon
 					isOpen: false,
 				},
 			}));
-		},
-		[setFiles]
+
+			// if we closed the current tab, select another one
+			if (selectedTab === fileName) {
+				const anotherOpenFile = Object.keys(files).find(fn => fn !== fileName && files[fn].isOpen);
+				setSelectedTab(anotherOpenFile || "");
+			}
+		}
 	);
 
-	const areAnyFilesOpen = Object.values(files).some(file => file.isOpen);
 	return (
+		<>
+		{selectedTab && (
 		<TabContext value={selectedTab}>
-			{areAnyFilesOpen && (
 				<>
 					<Box sx={{
 						borderBottom: 1,
 						borderColor: "divider",
 						minHeight: "48px",
-						display: areAnyFilesOpen ? 'block' : 'none'
+						display: 'block'
 					}}>
-						<TabList onChange={(e, newTab) => setSelectedTab(newTab)}
-						 variant="standard" scrollButtons="auto" sx={{
+						<TabList onChange={(e, newTab) => {
+							if (files[newTab].isOpen) {
+								setSelectedTab(newTab);
+							}
+						}}
+						variant="standard" scrollButtons="auto" sx={{
 							'& .MuiTabs-indicator': {
 								backgroundColor: '#89CFEF',
 								height: "1px"
@@ -104,9 +120,9 @@ const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleCon
 						</SimpleBar>
 					</TabPanel>
 				</>
-			)}
-
 		</TabContext>
+		)}
+		</>
 	);
 };
 

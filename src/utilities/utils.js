@@ -6,7 +6,7 @@ export function formatCode(code) {
         parser: "html",
         plugins: [parserHtml],
         printWidth: 80,
-        tabWidth: 2,
+        tabWidth: 4,
         singleQuote: true,
         trailingComma: "all",
         bracketSpacing: true,
@@ -39,4 +39,38 @@ export function insertCode(editor, chunk, isFirstChunk, from = null, to = null) 
     return from + chunk.length;
 }
 
+export function buildMetaData(files) {
+    if (!files || files.length === 0 || !files[0].SK) {
+        console.error('Invalid files data:', files);
+        return {fileMetaData: {}, projectTree: {}};
+    }
+    // project tree only needs to store the path and its children
+    // other metadata should be stored in separate dictionary
+    let idCounter = 1;
+    let projectName = files[0].SK.split('#')[1].replace('_file', '');  // Assuming all files belong to the same project
+    let projectTree = { id: idCounter++, name: projectName, children: [] };
+    let nodeLookup = { [projectName]: projectTree };
+    let fileMetaData = {};
+
+    // iterate through sorted files and create tree
+    for (let file of files) {
+        let filePath = file.SK.split('#')[2];
+        let pathArr = filePath.split('/');
+
+        // create nodes for each directory in path
+        let currentPath = projectName;
+        for (let dir of pathArr) {
+            currentPath += '/' + dir;
+            // create new node if it doesn't exist already
+            if (!(currentPath in nodeLookup)) {
+                let newNode = { id: idCounter++, name: dir, children: [] };
+                nodeLookup[currentPath] = newNode;
+                nodeLookup[currentPath.slice(0, currentPath.lastIndexOf('/'))].children.push(newNode);
+            }
+        }
+        fileMetaData[currentPath] = {fileLink: file.fileLink, language: file.language, isOpen: false, s3_key: file.s3_key};
+    }
+
+    return {fileMetaData: fileMetaData, projectTree: projectTree};
+}
 

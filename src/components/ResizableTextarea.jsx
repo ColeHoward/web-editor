@@ -7,6 +7,7 @@ const ResizableTextArea = ({ inputValue, setInputValue, handleSubmit, returnHeig
 	const [cols, setCols] = useState(70);
 	const [rows, setRows] = useState(1);
 	const [numNewLines, setNumNewLines] = useState(0);
+
 	// pass height back to parent to resize output box
 	useEffect(() => {
 		returnHeight((rows) * 20)  // each new row is 20px
@@ -17,7 +18,7 @@ const ResizableTextArea = ({ inputValue, setInputValue, handleSubmit, returnHeig
 		const textLength = inputValue.length;
 		const newRows = Math.ceil((textLength) / cols);
 		setRows(Math.max(Math.min(newRows + numNewLines, 10), 1));
-	}, [inputValue, cols]);
+	}, [inputValue, cols, rows, numNewLines]);
 
 	// calculate cols based on the parent width and the width of a character
 	useEffect(() => {
@@ -52,31 +53,33 @@ const ResizableTextArea = ({ inputValue, setInputValue, handleSubmit, returnHeig
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
 			// Add newline on 'Enter'
-			setInputValue((currentValue) => `${currentValue}\n`);
-			setNumNewLines((currentValue) => currentValue + 1);
+			setInputValue((currentValue) => {
+				setNumNewLines((currentValue) => currentValue + 1);
+				return `${currentValue}\n`
+			});
+
 		} else if (event.key === "Enter" && event.shiftKey) {
 			event.preventDefault();
 			handleSubmit();
-		}
-	}
-	const handleKeyUp = (event) => {
-		if (event.key === 'Backspace') {
+		}else if (event.key === 'Backspace') {
 			// Count the number of newline characters in the inputValue
 			const newlineCount = (inputValue.match(/\n/g) || []).length;
 			setNumNewLines(newlineCount);
+		}else{
+
 		}
+
 	}
 	return (
 		<textarea
 			className={"prompt-area"}
 			ref={textAreaRef}
 			onKeyDown={(e) => handleKeyDown(e)}
-			onKeyUp={(e) => handleKeyUp(e)}
 			value={inputValue}
 			onChange={(e) => setInputValue(e.target.value)}
 			rows={rows || 1}
 			cols={cols}
-			placeholder={ "Type your prompt here..."}
+			placeholder={"Type your prompt here..."}
 			style={{
 				resize: 'none',
 				overflowY: 'auto',

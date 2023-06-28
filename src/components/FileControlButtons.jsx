@@ -6,8 +6,6 @@ import { useState } from 'react';
 const FileControlButtons = ({ files }) => {
 	const [newFileName, setNewFileName] = useState("");
 	const [isAddingFile, setIsAddingFile] = useState(false);
-	// only needs to store file structure'
-	// file content will be stored in DevelopmentPage
 	const handleNewFile = () => {
 		setIsAddingFile(true);
 	}
@@ -17,13 +15,13 @@ const FileControlButtons = ({ files }) => {
 			console.log('Add new file', newFileName);
 			setIsAddingFile(false);
 			setNewFileName("");
-			// Now you can add the file to your files state
+			// add the file to your files state
 		}
 	}
 
 	const handleNewDirectory = () => {
 		console.log('Add new directory');
-		// Add your function for adding a new directory here
+		// Add function for adding a new directory here
 	}
 
 	return (

@@ -45,7 +45,7 @@ app.post('/put-file', upload.single('file'), async function (req, res, next) {
     const language = req.body.language
     const type = req.body.type  // file or directory; not really necessary b/c only upload files
     // const projectType = req.body.projectType // e.g. html, js, python, etc., could maybe just append to project name
-
+    // TODO add container ID for the project, either in the project name or as a separate field
     /*********************************************** STORE FILES ON S3 ***********************************************/
     const params = {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
