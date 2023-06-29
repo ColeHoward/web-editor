@@ -28,7 +28,7 @@ const FileTree = ({ fileTree, minWidth = 100, maxWidth = 300 , openFile}) => {
 		if (node.children && node.children.length > 0) {
 			return (
 				<TreeItem
-					nodeId={node.id.toString()}
+					nodeId={node.id ? node.id.toString() : ""}
 					label={
 						<div style={{ display: 'flex', alignItems: 'center', fontSize: "1.3em", textAlign: 'left' }}>
 							{node.name}
@@ -42,7 +42,7 @@ const FileTree = ({ fileTree, minWidth = 100, maxWidth = 300 , openFile}) => {
 		}
 		return (
 			<TreeItem
-				nodeId={node.id.toString()}
+				nodeId={node.id ? node.id.toString() : ""}
 				label={
 					<div style={{ display: 'flex', alignItems: 'center', fontSize: "1.3em", width: "100%", textAlign: 'left'}}
 						 onClick={() => openFile(newPath)}

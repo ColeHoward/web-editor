@@ -22,10 +22,22 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 
 	/******************************************* HANDLE PANEL RESIZING *******************************************/
 	const [panelWidths, setPanelWidths] = useState({
-			leftWidth: (window.innerWidth-40) / 2, // -40 to account for sidebar
-			rightWidth: (window.innerWidth-40) / 2
+		leftPercent: 0.5,
+		rightPercent: 0.5
 	});
+	const getPixelWidth = (percentage) => (window.innerWidth - 45) * percentage;
+
 	const [code, setCode] = useState('');
+
+	useEffect(() => {
+		function handleResize() {
+			// Force a re-render when window resizes
+			setPanelWidths(prevWidths => ({...prevWidths}));
+		}
+
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
 
 	const onMouseDown = useCallback((e) => {
 		if (language === "html") {
@@ -39,11 +51,16 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 			e.preventDefault() // prevent text selection when resizing
 			const { movementX } = e;
 			setPanelWidths((prevWidths) => {
-				const newLeftWidth = prevWidths.leftWidth + movementX;
-				const newRightWidth = prevWidths.rightWidth - movementX;
-				return { leftWidth: newLeftWidth, rightWidth: newRightWidth };
+				const totalWidth = window.innerWidth - 45;
+				const newLeftWidth = getPixelWidth(prevWidths.leftPercent) + movementX;
+				const newRightWidth = getPixelWidth(prevWidths.rightPercent) - movementX;
+				return {
+					leftPercent: newLeftWidth / totalWidth,
+					rightPercent: newRightWidth / totalWidth
+				};
 			});
 		};
+
 
 		const onMouseUp = () => {
 			window.removeEventListener('mousemove', onMove);
@@ -68,11 +85,9 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 	const editorRef = useRef(null);
 
 	const handleContextMenu = (event) => {
-		console.log('in handle context menu')
 		event.preventDefault();
 
 		if (editorRef.current) {
-			console.log('editor not null')
 			const editor = editorRef.current;
 			const selection = editor.state.selection.main;
 			const doc = editor.state.doc;
@@ -84,8 +99,6 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 
 			setMenuPosition({ x: `${event.pageX}px`, y: `${event.pageY}px` });
 			setShowMenu(true);
-		}else {
-			console.log('editor is null')
 		}
 	};
 
@@ -173,20 +186,26 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 				isVisible={promptBoxVisible}
 				onSubmit={handlePromptSubmit}
 				onCancel={handlePromptCancel}
+				position={menuPosition}
 			/>
-			<Panel id={"code-mirror-container"} width={panelWidths.leftWidth} >
-				{showMenu && (
-					<ContextMenu menuPosition={menuPosition} setPromptBoxVisible={setPromptBoxVisible}
-								 onClick={() => setShowMenu(false)} setShowMenu={setShowMenu} showMenu={showMenu}/>
-				)}
+			{showMenu && (
+				<ContextMenu menuPosition={menuPosition} setPromptBoxVisible={setPromptBoxVisible}
+							 onClick={() => setShowMenu(false)} setShowMenu={setShowMenu} showMenu={showMenu}/>
+			)}
+			<div className={"box"} style={{ width: getPixelWidth(panelWidths.leftPercent) ? `${getPixelWidth(panelWidths.leftPercent)}px` : "100%", margin: "0 auto", height: "100%"}} >
+
+
 				<TabbedEditor code={code} setCode={setCode} language={language} editorRef={editorRef}
 							  handleContextMenu={handleContextMenu} files={files} setFiles={setFiles} userId={userId}
 							  projectId={projectId} projectTree={projectTree}
 				/>
-			</Panel>
+
+			</div>
 			<Divider onMouseDown={onMouseDown} style={{margin: "0 auto"}} />
-			<Panel width={panelWidths.rightWidth}>
-				<TabbedHelper language={language} code={code}/>
+			<Panel width={getPixelWidth(panelWidths.rightPercent)}>
+				<div className={"panel-content-container"} style={{width: "97.5%", height: "100vh", }}>
+					<TabbedHelper language={language} code={code} currWidth={getPixelWidth(panelWidths.rightPercent)}/>
+				</div>
 			</Panel>
 		</div>
 	);

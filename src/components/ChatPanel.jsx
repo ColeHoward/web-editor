@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
 import { Box, Typography, Card } from '@mui/material';
 import ResizableTextArea from "./ResizableTextarea";
-import {ReactComponent as SendIcon} from "../assets/icons/send.svg";
 import {chatGPT} from "../utilities/api";
 import CodeBlock from "./CodeBlock";
+import SendIcon from "./icons/SendIcon"
 
-
-const ChatPanel = ({selectedText, messages, setMessages}) => {
+const ChatPanel = ({selectedText, messages, setMessages, currWidth}) => {
 	const [inputValue, setInputValue] = useState('');
 	const [textAreaHeight, setTextAreaHeight] = useState(20);
 
@@ -42,10 +41,10 @@ const ChatPanel = ({selectedText, messages, setMessages}) => {
 	};
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', alignItems: 'center', fontSize: "13px", padding: "0 0 10px 0",
-			justifyContent: "flex-start", width: "97.5%"}}>
-			<Box sx={{ display: 'block', flexDirection: 'column', height: `calc(90% - 26px - ${textAreaHeight}px)`, width: '100%', overflow: 'auto',
-				p: 1, border: 1, borderColor: 'divider', borderBottomLeftRadius: '5px' , borderBottomRightRadius: '5px', alignItems: "flex-start", padding: "10px 10px 10px 10px", justifyContent: "flex-start",
+		<Box sx={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 48px)', alignItems: 'center', fontSize: "13px", padding: "0 0 10px 0",
+			justifyContent: "flex-start", width: "100%"}}>
+			<Box className={"prompt-response"} sx={{ display: 'block', flexDirection: 'column', height: `calc(90vh - 12px - ${textAreaHeight}px)`, width: '100%', overflow: 'auto',
+				p: 1, border: 1, borderColor: 'divider', borderBottomLeftRadius: '5px' , borderBottomRightRadius: '5px', alignItems: "flex-start", padding: "10px 0px 10px 0px", justifyContent: "flex-start",
 				backgroundColor: "#1e1e1e", overflowY: "auto"}}>
 				{messages.map((message, index) => {
 					const chunks = message.text.split("```");
@@ -53,11 +52,13 @@ const ChatPanel = ({selectedText, messages, setMessages}) => {
 					return (
 						<Card variant="outlined"
 							  sx={{
-								  bgcolor: message.from === 'user' ? '#1A1A1A;': '#1e1e1e',
+								  bgcolor: message.from === 'user' ? 'rgba(255, 255, 255, 0.06);': '#1e1e1e',
 								  width: "100%",
 								  textAlign: "left",
 								  padding: message.from === 'user' ? "5px 10px" : "5px 20px",
 								  border: "none",
+								  borderRadius: "0",
+								  margin: "10px 0",
 							  }}>
 							{chunks.map(chunk => {
 								if (codeBlockOpen) {
@@ -69,13 +70,14 @@ const ChatPanel = ({selectedText, messages, setMessages}) => {
 								} else {
 									codeBlockOpen = true;
 									return (
-										<Typography variant="body1" color="whitesmoke"
+										<Typography variant="body1" color={message.from === 'user' ? 'whitesmoke': 'whitesmoke'}
 													style={{
 														padding: "5px",
 														whiteSpace: 'pre-wrap',
 														wordWrap: "break-word",
 														fontSize: "15px",
-														lineHeight: "1.7"
+														lineHeight: "1.7",
+														fontWeight: message.from === 'user' ? "bold" : "normal",
 													}}>
 											{chunk}
 										</Typography>
@@ -91,11 +93,13 @@ const ChatPanel = ({selectedText, messages, setMessages}) => {
 				 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', mt: 2, justifyContent: "space-between", wordWrap: ""}}
 				 style={{backgroundColor: "#1e1e1e", padding: "10px 20px", borderRadius: "5px", width: '100%'}}
 			>
-				<ResizableTextArea style={{marginRight: "10px", fontFamily: "Fira Code"}} numCols={70} returnHeight={setTextAreaHeight}
-								   inputValue={inputValue} setInputValue={setInputValue} handleSubmit={handleSubmit}/>
+				<ResizableTextArea style={{marginRight: "10px", fontFamily: "Fira Code"}} numCols={70} returnHeight={(height) => setTextAreaHeight(height + 20)}
+								   inputValue={inputValue} setInputValue={setInputValue} handleSubmit={handleSubmit}
+									width={currWidth}
+				/>
 				<SendIcon type="submit" onClick={handleSubmit}
-						  style={{ color: "gray", width: "20px", height: "20px", flexGrow: "0", cursor: "pointer"}}
-						  title="Shift+Enter"/>
+						  style={{ width: "20px", height: "20px", flexGrow: "0", cursor: "pointer"}}
+						  title="Shift+Enter" idSuffix="chatPanel"/>
 			</Box>
 		</Box>
 	)

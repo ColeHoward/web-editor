@@ -2,84 +2,48 @@ import React, { useRef, useState, useEffect } from 'react';
 import './style/textArea.css'
 
 
-const ResizableTextArea = ({ inputValue, setInputValue, handleSubmit, returnHeight }) => {
+const ResizableTextArea = ({inputValue, setInputValue, handleSubmit, returnHeight, width, placeholder }) => {
 	const textAreaRef = useRef();
-	const [cols, setCols] = useState(70);
-	const [rows, setRows] = useState(1);
-	const [numNewLines, setNumNewLines] = useState(0);
-
-	// pass height back to parent to resize output box
-	useEffect(() => {
-		returnHeight((rows) * 20)  // each new row is 20px
-	}, [rows])
+	const [cols, setCols] = useState(width / (14 * 0.6));
 
 	useEffect(() => {
-		// update rows
-		const textLength = inputValue.length;
-		const newRows = Math.ceil((textLength) / cols);
-		setRows(Math.max(Math.min(newRows + numNewLines, 10), 1));
-	}, [inputValue, cols, rows, numNewLines]);
+		if (!textAreaRef.current) return;
+		textAreaRef.current.style.height = "0";
+		const scrollHeight = textAreaRef.current.scrollHeight;
+		const newHeight = inputValue ? Math.max(Math.min(scrollHeight, 20*8), 20) : 20;
+		returnHeight(newHeight);  // Call this first
+		textAreaRef.current.style.height = newHeight + "px";
+	}, [inputValue]);
 
-	// calculate cols based on the parent width and the width of a character
+
 	useEffect(() => {
-		if (!textAreaRef.current || (textAreaRef.current && !textAreaRef.current.parentElement)) return;
-
-		const parentElement = textAreaRef.current.parentElement;
-
-		const handleResize = () => {
-			const parentWidth = parentElement.offsetWidth;
-			const style = window.getComputedStyle(textAreaRef.current);
-			const fontSize = parseFloat(style.fontSize);
-			setCols(Math.floor(parentWidth / (fontSize * 0.7)));
-		};
-
-		// initialize a ResizeObserver
-		const ro = new ResizeObserver(handleResize);
-
-		// start observing the parent element
-		ro.observe(parentElement);
-
-		// Run the resize handler once to initialize cols
-		handleResize();
-
-		return () => {
-			// stop observing on cleanup
-			ro.disconnect();
-		};
-	}, []);
-
+		if (!textAreaRef.current) return;
+		const style = window.getComputedStyle(textAreaRef.current);
+		const fontSize = parseFloat(style.fontSize);
+		setCols(Math.floor(width / (fontSize * 0.6)));  // is there a better way to do this?
+	}, [width]);
 
 	const handleKeyDown = (event) => {
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
-			// Add newline on 'Enter'
-			setInputValue((currentValue) => {
-				setNumNewLines((currentValue) => currentValue + 1);
-				return `${currentValue}\n`
-			});
-
+			setInputValue((currentValue) => `${currentValue}\n`);
 		} else if (event.key === "Enter" && event.shiftKey) {
 			event.preventDefault();
 			handleSubmit();
-		}else if (event.key === 'Backspace') {
-			// Count the number of newline characters in the inputValue
-			const newlineCount = (inputValue.match(/\n/g) || []).length;
-			setNumNewLines(newlineCount);
-		}else{
-
 		}
-
 	}
+
 	return (
 		<textarea
 			className={"prompt-area"}
 			ref={textAreaRef}
-			onKeyDown={(e) => handleKeyDown(e)}
+			onKeyDown={handleKeyDown}
+			onChange={(e) => {
+				setInputValue(e.target.value);
+			}}
 			value={inputValue}
-			onChange={(e) => setInputValue(e.target.value)}
-			rows={rows || 1}
-			cols={cols}
-			placeholder={"Type your prompt here..."}
+			rows={1}
+			placeholder={placeholder ?? "Type your prompt here..."}
 			style={{
 				resize: 'none',
 				overflowY: 'auto',
@@ -88,6 +52,9 @@ const ResizableTextArea = ({ inputValue, setInputValue, handleSubmit, returnHeig
 				color: "whitesmoke",
 				fontFamily: "Fira Code",
 				width: `${cols}ch`,
+				lineHeight: "20px",
+				height: "20px !important",
+				padding: '0',  // Add this line
 			}}
 		/>
 	);

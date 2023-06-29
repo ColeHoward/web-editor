@@ -1,12 +1,13 @@
 import React from 'react';
 import Prism from 'prismjs';
-// import './style/prism-shades-of-purple.css';
-// import './style/codeBlockStyle.css';
 import 'prismjs/themes/prism-tomorrow.css';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-jsx';
 import { useEffect, useState } from 'react';
 import {CopyIcon} from './icons/CopyIcon';
+
+
 const CodeBlock = ({ language, code }) => {
 	const [isCopied, setIsCopied] = useState(false);
 	useEffect(() => {

@@ -8,7 +8,7 @@ import PythonConsole from "./PythonConsole";
 import ChatPanel from "./ChatPanel";
 import {HtmlRenderer} from "./HtmlRenderer";
 
-const TabbedHelper = ({ setCode, language, files, setFiles, code }) => {
+const TabbedHelper = ({ setCode, language, files, setFiles, code, currWidth }) => {
 	const [selectedTab, setSelectedTab] = useState("Run");
 	// const areAnyFilesOpen = Object.values(files).some(file => file.isOpen);
 	const [messages, setMessages] = useState([]);
@@ -32,7 +32,7 @@ const TabbedHelper = ({ setCode, language, files, setFiles, code }) => {
 				borderBottom: 1,
 				borderColor: "divider",
 				minHeight: "48px",
-				width: "97.5%",
+				width: "100%",
 				display: "flex",
 				justifyContent: "space-around",
 				backgroundColor: "#1A1A1A"
@@ -62,18 +62,12 @@ const TabbedHelper = ({ setCode, language, files, setFiles, code }) => {
 				</TabList>
 			</Box>
 
-			<TabPanel value={selectedTab} style={{overflowY: "auto", backgroundColor: "#1A1A1A", display: "flex", justifyContent: "space-around"}}>
+			<TabPanel value={selectedTab} style={{overflowY: "auto", backgroundColor: "#1A1A1A", display: "flex", justifyContent: "space-around", width: "100%"}}>
 				{selectedTab === "Run" && (
-					<SimpleBar style={{
-						maxHeight: "calc(100vh - 48px)",
-						width: "calc(97.55%)",
-						padding: "0px",
-					}}>
-						{outputTab()}
-					</SimpleBar>
+						outputTab()
 				)}
 				{selectedTab === "Chat" && (
-					<ChatPanel messages={messages} setMessages={setMessages} />
+					<ChatPanel messages={messages} setMessages={setMessages} currWidth={.975 * currWidth} />
 				)}
 
 

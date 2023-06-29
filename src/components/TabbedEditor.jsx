@@ -16,6 +16,7 @@ const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleCon
 		setOpenTabs(Object.keys(files).filter(fileName => files[fileName].isOpen));
 	}, [files]);
 
+
 	useEffect(() => {
 		if (!openTabs.includes(selectedTab)) {
 			const firstOpenTab = openTabs[0];

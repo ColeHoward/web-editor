@@ -31,7 +31,9 @@ function App() {
         setProjectId(testProjectId);
         fetchData(userId, projectId);
     }, [userId, projectId])
-
+    useEffect(() => {
+        console.log('in app.js')
+    })
   return (
       <div className="App">
           <DevelopmentPage language={"python"} userId={testUserId} projectId={testProjectId} projectFiles={projectFiles}
