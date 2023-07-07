@@ -1,48 +1,34 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/pythonConsoleStyle.css'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from 'react-bootstrap';
 import playIcon from  '../assets/icons/play-solid.svg';
-// import stopIcon from  '../assets/icons/stop.svg';
 import SimpleBar from "simplebar-react";
 const { SSE } = require('sse.js');
 
 
-function PythonConsole({ pythonCode, consoleOutput, setConsoleOutput }) {
+function PythonConsole({ pythonCode, consoleOutput, setConsoleOutput, containerId, filePath }) {
+
 	const runPythonCode = () => {
 		if (!pythonCode.trim()) return;
-		// Reset console output
 		setConsoleOutput('');
+		const url = `http://localhost:3003/execute?containerId=${containerId}&filepath=${filePath}`;
 
-		const url = `http://127.0.0.1:5000/execute`;
+		const source = new SSE(url);
 
-		try {
-			const source = new SSE(url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				payload: JSON.stringify({
-					code: pythonCode,
-				}),
-			});
+		source.addEventListener('message', function(e) {
+			let output = e.data;
+			// Replace "\\n" with newline characters
+			let decodedOutput = output.replace(/\\n/g, '\n');
+			setConsoleOutput((prev) => prev + decodedOutput);
+		});
 
-			source.stream();
-			source.addEventListener('message', function(e) {
-				// Append the new output to the console output
-				setConsoleOutput((prevOutput) => {
-					return prevOutput + JSON.parse(e.data)
-				});
-			});
+		source.addEventListener('DONE', function(e) {
+			console.log('Stream finished.');
+			source.close();
+		});
 
-			source.addEventListener('error', function(e) {
-				source.close();
-				setConsoleOutput('An error occurred while executing the Python code.');
-			});
-
-		} catch (err) {
-			setConsoleOutput('An error occurred while executing the Python code.');
-		}
+		source.stream();
 	};
 
 	return (

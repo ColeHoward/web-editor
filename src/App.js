@@ -1,7 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {DevelopmentPage} from "./pages/DevelopmentPage";
-import {createTheme} from "@mui/material/styles";
 import {getProjectMetaData} from "./utilities/api";
 import {useEffect, useState} from "react";
 
@@ -9,11 +8,7 @@ import {useEffect, useState} from "react";
 const testProjectId = "testProject";
 const testUserId = "Cole";
 
-const theme = createTheme({
-    palette: {
-        mode: 'dark',
-    },
-});
+
 function App() {
     // TODO move this logic into open/create project page
     let [userId, setUserId] = useState(testUserId);

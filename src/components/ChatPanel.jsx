@@ -98,7 +98,7 @@ const ChatPanel = ({selectedText, messages, setMessages, currWidth}) => {
 									width={currWidth}
 				/>
 				<SendIcon type="submit" onClick={handleSubmit}
-						  style={{ width: "20px", height: "20px", flexGrow: "0", cursor: "pointer"}}
+						  style={{ width: "20px", height: "20px", minWidth: "20px", flexGrow: "1", cursor: "pointer"}}
 						  title="Shift+Enter" idSuffix="chatPanel"/>
 			</Box>
 		</Box>

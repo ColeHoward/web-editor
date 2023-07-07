@@ -3,12 +3,11 @@ import {Tab, Box } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabList from '@mui/lab/TabList';
 import TabContext from '@mui/lab/TabContext';
-import SimpleBar from 'simplebar-react';
 import PythonConsole from "./PythonConsole";
 import ChatPanel from "./ChatPanel";
 import {HtmlRenderer} from "./HtmlRenderer";
 
-const TabbedHelper = ({ setCode, language, files, setFiles, code, currWidth }) => {
+const TabbedHelper = ({ setCode, language, files, setFiles, code, currWidth, currFilePath, containerId }) => {
 	const [selectedTab, setSelectedTab] = useState("Run");
 	// const areAnyFilesOpen = Object.values(files).some(file => file.isOpen);
 	const [messages, setMessages] = useState([]);
@@ -17,7 +16,7 @@ const TabbedHelper = ({ setCode, language, files, setFiles, code, currWidth }) =
 		if (language === "python") {
 			return (
 				<PythonConsole language={language} pythonCode={code} consoleOutput={consoleOutput}
-							   setConsoleOutput={setConsoleOutput}
+							   setConsoleOutput={setConsoleOutput} filePath={currFilePath} containerId={containerId}
 				/>
 			)
 		}else if (language === "html") {

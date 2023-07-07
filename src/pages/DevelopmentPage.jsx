@@ -3,18 +3,14 @@ import '../components/style/tabbedStyle.css'
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../pages/style/developmentPage.css'
-import PythonConsole from "../components/PythonConsole";
 import PromptBox from "../components/PromptBox";
 import askGPT from "../utilities/api";
 import ContextMenu from "../components/ContextMenu";
 import {insertCode} from "../utilities/utils";
-import {HtmlRenderer} from "../components/HtmlRenderer";
 import {Divider} from "../components/Divider";
 import Panel from "../components/Panel";
 import Sidebar from "../components/Sidebar";
 import TabbedEditor from "../components/TabbedEditor";
-import TestComponent from "../TestComponent";
-import ResizableTextArea from "../components/ResizableTextarea";
 import TabbedHelper from "../components/TabbedHelper";
 
 
@@ -60,7 +56,6 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 				};
 			});
 		};
-
 
 		const onMouseUp = () => {
 			window.removeEventListener('mousemove', onMove);
@@ -179,6 +174,8 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 	}
 
 	// TODO if new file is added, add new object to files and set to open
+
+	const [currFilePath, setCurrFilePath] = useState(null);
 	return (
 		<div className={'wrapper'} >
 			<Sidebar style={{overflow: "hidden"}} openFile={openFile} projectTree={projectTree} ></Sidebar>
@@ -197,14 +194,15 @@ export function DevelopmentPage({language, userId, projectId, projectFiles, setP
 
 				<TabbedEditor code={code} setCode={setCode} language={language} editorRef={editorRef}
 							  handleContextMenu={handleContextMenu} files={files} setFiles={setFiles} userId={userId}
-							  projectId={projectId} projectTree={projectTree}
+							  projectId={projectId} projectTree={projectTree} setCurrFilePath={setCurrFilePath}
 				/>
 
 			</div>
 			<Divider onMouseDown={onMouseDown} style={{margin: "0 auto"}} />
 			<Panel width={getPixelWidth(panelWidths.rightPercent)}>
 				<div className={"panel-content-container"} style={{width: "97.5%", height: "100vh", }}>
-					<TabbedHelper language={language} code={code} currWidth={getPixelWidth(panelWidths.rightPercent)}/>
+					<TabbedHelper language={language} code={code} currWidth={getPixelWidth(panelWidths.rightPercent)}
+					  currFilePath={currFilePath} containerId={'a267807ede2926445fba2ed3ccf4958c645c92f635c9105e8a6e730fe4acd0c3'}/>
 				</div>
 			</Panel>
 		</div>

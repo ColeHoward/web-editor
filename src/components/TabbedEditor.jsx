@@ -8,7 +8,7 @@ import {ReactComponent as CloseIcon} from '../assets/icons/close.svg'
 import SimpleBar from 'simplebar-react';
 
 
-const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleContextMenu }) => {
+const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleContextMenu, setCurrFilePath }) => {
 	const [selectedTab, setSelectedTab] = useState(null);
 	const [openTabs, setOpenTabs] = useState(Object.keys(files).filter(fileName => files[fileName].isOpen));
 
@@ -29,6 +29,7 @@ const TabbedEditor = ({ setCode, language, editorRef, files, setFiles, handleCon
 		if (currentFile && currentFile.isOpen) {
 			setCode(currentFile.content || "");
 		}
+		setCurrFilePath(selectedTab || "")
 	}, [selectedTab, files, setCode]);
 
 	const handleCodeChange = useCallback(

@@ -13,15 +13,21 @@ const port = 3002;
 AWS.config.update({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION
 });
+
+const s3 = new AWS.S3({
+    region: process.env.S3_REGION
+});
+
+const dynamoDb = new AWS.DynamoDB.DocumentClient({
+    region: process.env.DYNAMO_REGION
+});
+
 
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
-const s3 = new AWS.S3();
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const upload = multer({
     storage: multerS3({
@@ -136,8 +142,6 @@ app.get('/get-file', async function(req, res, next) {
         }
     });
 });
-
-
 
 
 app.listen(port, () => {
