@@ -6,20 +6,13 @@ const AWS = require('aws-sdk');
 const ProjectManager = require('./ProjectManager');
 const fs = require('fs');
 const path = require('path');
-const dotenv = require('dotenv');
-
+const dotenv = require('dotenv');0
 
 dotenv.config({ path: '.env' });
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-const http = require('http');
-const server = http.createServer(app);
-const socketIO = require('socket.io');
-const io = socketIO(server);
-
 
 // Setup AWS clients
 const s3 = new AWS.S3({
@@ -38,7 +31,8 @@ const docker = new Docker();  // Docker client
 
 const homeDir = '/home/appuser';
 
-const PM = new ProjectManager(s3, dynamodb, docker, process.env.DYNAMODB_TABLE_NAME, process.env.AWS_S3_BUCKET_NAME, homeDir);
+const PM = new ProjectManager(s3, dynamodb, docker, process.env.DYNAMODB_TABLE_NAME,
+                                                process.env.AWS_S3_BUCKET_NAME, homeDir);
 
 // Multer middleware for handling form-data
 // Multer configuration
@@ -61,6 +55,8 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+let containerActivity = {};  // Maps container IDs to the last time they were active
 
 
 app.post('/projects', upload.none(), async (req, res) => {
@@ -92,7 +88,6 @@ app.post('/projects', upload.none(), async (req, res) => {
         console.error(error);
         return res.status(500).send("Failed to create project");
     }
-
     try {
         if (!hostProjectPath) { return res.status(500).send("Failed to create Docker container");}
         const command = ['bash', '-c',
@@ -112,12 +107,12 @@ app.post('/projects', upload.none(), async (req, res) => {
         });
 
         await container.start();
+        containerActivity[container.id] = Date.now();
+        return res.json({ container_id: container.id });
     } catch (error) {
         console.error(error);
         return res.status(500).send("Failed to create Docker container");
     }
-
-    res.send('Project and Docker container created successfully');
 });
 
 
@@ -174,6 +169,7 @@ app.post('/projects/:projectName', async (req, res) => {
         });
 
         await container.start();
+        containerActivity[container.id] = Date.now();
         return res.json({ container_id: container.id });
     } catch (error) {
         console.error(error);
@@ -182,12 +178,14 @@ app.post('/projects/:projectName', async (req, res) => {
 });
 
 app.get('/execute', (req, res) => {
+
     const containerId = req.query.containerId;
     const filepath = req.query.filepath;
-    console.log(containerId, filepath)
+    console.log('executing', containerId, filepath)
     const container = docker.getContainer(containerId);
     const command = ['python', '-u', `./${filepath}`];
 
+    containerActivity[container.id] = Date.now();
     // SSE Setup
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
@@ -207,11 +205,10 @@ app.get('/execute', (req, res) => {
             // Stream the output
             stream.on('data', (data) => {
                 let output = data.toString('utf8');
-                // Replace newline characters "\\n"
-                let encodedOutput = output.replace(/\n/g, '\\n');
+                // Replace newline characters "\\n" and tab characters "\\t"
+                let encodedOutput = output.replace(/\n/g, '\\n').replace(/\t/g, '\\t');
                 res.write(`data: ${encodedOutput}\n\n`); // SSE data format
             });
-
 
             stream.on('end', () => {
                 // After the data stream has ended
@@ -224,11 +221,16 @@ app.get('/execute', (req, res) => {
 });
 
 
+
 app.put('/projects/:projectName/files', upload.single('file'), async (req, res) => {
     if (!req.file || !req.body.userId || !req.params.projectName || !req.body.filePath) {
+        console.log('One or more request arguments are missing')
         return res.status(400).json({ message: "One or more request arguments are missing" });
     }
-
+    const containerId = req.body.containerId
+    if (containerId) {
+        containerActivity[containerId] = Date.now();
+    }
     const { originalname: name, path: tempPath } = req.file;
     const { projectName } = req.params;
     let { filePath, userId } = req.body;
@@ -269,25 +271,12 @@ app.put('/projects/:projectName/files', upload.single('file'), async (req, res) 
 });
 
 
-app.post('/stop/:containerId', async (req, res) => {
+app.delete('/containers/:containerId', async (req, res) => {
     const containerId = req.params.containerId;
 
     try {
         const container = docker.getContainer(containerId);
         await container.stop();
-
-        res.json({ status: 'success' });
-    } catch (e) {
-        console.error(e);
-        res.status(400).json({ message: "Invalid container ID" });
-    }
-});
-
-app.post('/delete/:containerId', async (req, res) => {
-    const containerId = req.params.containerId;
-
-    try {
-        const container = docker.getContainer(containerId);
         await container.remove();
 
         res.json({ status: 'success' });
@@ -298,7 +287,28 @@ app.post('/delete/:containerId', async (req, res) => {
 });
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3003;
 app.listen(port, () => {
     console.log(`Server is up and running on port ${port}`);
 });
+
+
+setInterval(async () => {
+    const cutoffTime = Date.now() - 30*60*1000;  // 30 minutes ago
+
+    for (let [containerId, lastActivityTime] of Object.entries(containerActivity)) {
+        if (lastActivityTime < cutoffTime) {
+            // This container hasn't been active in over an hour; stop and remove it
+            const container = docker.getContainer(containerId);
+
+            try {
+                await container.stop();
+                await container.remove();
+            } catch (err) {
+                console.error(`Failed to stop and remove container ${containerId}:`, err);
+            }
+
+            delete containerActivity[containerId];
+        }
+    }
+}, 30*60*1000);  // Run the job every 30 minutes

@@ -43,13 +43,19 @@ const upload = multer({
 });
 
 // this will either create a new file or update an existing one
-app.post('/put-file', upload.single('file'), async function (req, res, next) {
+app.put('/put-file', upload.single('file'), async function (req, res, next) {
+    // formData.append('userId', userId);
+    // formData.append('projectId', projectId);
+    // formData.append('filename', fileName)
+    // formData.append('code', fileContent);
+    // formData.append('language', language);
+
     const codeString = req.body.code;  // not storing on DynamoDB, only S3
     const userId = req.body.userId
     const projectId = req.body.projectId // may not be needed because path has project name in it?
     const filename = req.body.filename
     const language = req.body.language
-    const type = req.body.type  // file or directory; not really necessary b/c only upload files
+    console.log('filename:', filename)
     // const projectType = req.body.projectType // e.g. html, js, python, etc., could maybe just append to project name
     // TODO add container ID for the project, either in the project name or as a separate field
     /*********************************************** STORE FILES ON S3 ***********************************************/
@@ -61,7 +67,6 @@ app.post('/put-file', upload.single('file'), async function (req, res, next) {
     let s3Upload;
     try {
         s3Upload = await s3.upload(params).promise();  // similar to PUT request
-        console.log('S3 Upload Response:', s3Upload);
     } catch (error) {
         console.error('Error uploading to S3:', error);
         res.status(500).send(error);
@@ -77,14 +82,12 @@ app.post('/put-file', upload.single('file'), async function (req, res, next) {
             "fileLink": s3Upload.Location,
             "s3_key": s3Upload.Key,
             "language": language,
-            "type": type
         }
     };
 
     let dynamoResponse;
     try {
         dynamoResponse = await dynamoDb.put(dbParams).promise();
-        console.log('DynamoDB Response:', dynamoResponse);
     } catch (error) {
         console.error('Error updating DynamoDB:', error);
     }
@@ -109,7 +112,6 @@ app.get('/get-project-metadata', async function(req, res, next) {
     let dynamoResponse;
     try {
         dynamoResponse = await dynamoDb.query(dbParams).promise();
-        console.log('DynamoDB Response:', dynamoResponse);
     } catch (error) {
         console.error('Error querying DynamoDB:', error);
         res.status(500).send(error);

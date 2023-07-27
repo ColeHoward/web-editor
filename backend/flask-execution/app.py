@@ -158,7 +158,6 @@ def start_project(project_name):
 
 @app.route('/execute/<container_id>', methods=['GET'])
 def execute_code(container_id):
-    print('executing code')
     # TODO make this more secure; need more than just container_id to execute files
     """
     :file_path: path to file to execute (including file name)
@@ -167,7 +166,6 @@ def execute_code(container_id):
     """
     max_execution_time = 20  # in seconds
     try:
-        # Get the Docker container
         container = docker_client.containers.get(container_id)
     except Exception as e:
         print(e)
@@ -179,7 +177,7 @@ def execute_code(container_id):
     try:
         # Execute the file
         data = request.args
-        path_components = data.get('file_path', '').split('/')  # including file name
+        path_components = data.get('file_path', '').split('/')
         secure_components = [secure_filename(c) for c in path_components]
         if not secure_components or not any(secure_components):
                 abort(400, description="Invalid file path")
@@ -245,7 +243,6 @@ def update_file(project_name):
     return jsonify({"status": "File updated successfully"})
 
 
-
 @app.route('/stop/<container_id>', methods=['POST'])
 @cross_origin()
 def stop_container(container_id):
@@ -273,5 +270,4 @@ def delete_container(container_id):
 
 
 if __name__ == '__main__':
-
     app.run(debug=True, host='0.0.0.0')
