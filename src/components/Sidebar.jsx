@@ -6,7 +6,7 @@ import FormatIcon from '../assets/icons/format.svg';
 import DataArrayIcon from '@mui/icons-material/DataArray';
 
 
-export function Sidebar({openFile, projectTree}) {
+export function Sidebar({projectTree}) {
 	let [fileTreeOpen, setFileTreeOpen] = useState(false);
 	return (
 		<>
@@ -19,7 +19,7 @@ export function Sidebar({openFile, projectTree}) {
 			<img title={"auto-format"} src={FormatIcon} style={{width: "auto", height: "25px", margin: "10px 10px 10px 10px"}} alt={"format"}
 			/>
 		</div>
-		{fileTreeOpen && <FileTree openFile={openFile} isOpen={fileTreeOpen} fileTree={projectTree}/>
+		{fileTreeOpen && <FileTree isOpen={fileTreeOpen} fileTree={projectTree}/>
 		}
 		</>
 	)

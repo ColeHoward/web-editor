@@ -2,9 +2,10 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { Toast, Form } from 'react-bootstrap';
 import ResizableTextArea from "./ResizableTextarea";
 import SendIcon from "./icons/SendIcon"
+import {insertGPTResponse} from "../utilities/utils";
 
 
-function PromptBox({ isVisible, onSubmit, onCancel, position }) {
+function PromptBox({ isVisible, onCancel, position }) {
 	const [inputValue, setInputValue] = React.useState('');
 	const toastRef = useRef(null);
 	const [textAreaHeight, setTextAreaHeight] = React.useState(20);
@@ -45,10 +46,10 @@ function PromptBox({ isVisible, onSubmit, onCancel, position }) {
 
 
 	const handleSubmit = useCallback(() => {
-		onSubmit(inputValue);
+		insertGPTResponse(inputValue)
 		onCancel();
 		setInputValue('');
-	}, [inputValue, onSubmit]);
+	}, [inputValue]);
 
 	return (
 		<Toast id={"promptBox"}

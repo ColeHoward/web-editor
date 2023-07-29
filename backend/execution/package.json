@@ -1,0 +1,18 @@
+{
+  "name": "execution",
+  "version": "1.0.0",
+  "description": "Execution environment for user code",
+  "main": "execution.js",
+  "scripts": {
+    "start": "node execution.js"
+  },
+  "dependencies": {
+    "aws-sdk": "2.1413.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dockerode": "3.3.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "multer": "1.4.5-lts.1"
+  }
+}

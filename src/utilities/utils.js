@@ -1,5 +1,6 @@
 import prettier from 'prettier/standalone';
 import parserHtml from 'prettier/parser-html';
+import askGPT from "./api";
 
 export function formatCode(code) {
     return prettier.format(code, {
@@ -74,3 +75,42 @@ export function buildMetaData(files) {
     return {fileMetaData: fileMetaData, projectTree: projectTree};
 }
 
+export const insertGPTResponse = async (prompt, editorRef, selectedText, setPromptBoxVisible) => {
+    let isFirstChunk = true;
+    let originalSelection;
+    if (editorRef.current) {
+        originalSelection = editorRef.current.state.selection.main;
+    }
+    await askGPT(prompt, selectedText.current, async (chunk) => {
+        if (editorRef.current) {
+            const editor = editorRef.current;
+            if (chunk !== "j7&c#0Y7*O$X@Iz6E59Ix") {
+                if (isFirstChunk) {
+                    isFirstChunk = false;
+                    originalSelection.to = insertCode(editor, chunk, true, originalSelection.from,
+                        originalSelection.to);
+                } else {
+                    originalSelection.from = originalSelection.to;
+                    originalSelection.to = insertCode(editor, chunk, false, originalSelection.from);
+                }
+            }
+        }
+    })
+    if (setPromptBoxVisible) {
+        setPromptBoxVisible(false);
+    }
+};
+
+export function debounce(func, delay) {
+    let timerId;
+
+    return function (...args) {
+        const context = this;
+
+        clearTimeout(timerId);
+
+        timerId = setTimeout(() => {
+            func.apply(context, args);
+        }, delay);
+    };
+}

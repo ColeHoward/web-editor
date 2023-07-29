@@ -1,4 +1,4 @@
-import React, {useCallback, useState, useEffect} from "react";
+import React, {useCallback, useState, useEffect, useContext} from "react";
 import './style/fileSidebar.css';
 import './style/fileTreeStyle.css';
 import TreeView from '@mui/lab/TreeView';
@@ -9,11 +9,12 @@ import FileIcon from '../assets/icons/file-sharp.svg';
 import {Divider} from "./Divider";
 import FileControlButtons from "./FileControlButtons";
 import { GlobalStyles } from '@mui/system';
-
+import {FilesContext} from "../providers/FilesProvider";
 
 
 // TODO implement create new file/directory and delete file/directory
-const FileTree = ({ fileTree, minWidth = 100, maxWidth = 300 , openFile}) => {
+const FileTree = ({ fileTree, minWidth = 100, maxWidth = 300 }) => {
+	const {openFile} = useContext(FilesContext);
 	const [width, setWidth] = useState(minWidth);
 	const [isResizing, setIsResizing] = useState(false);
 

@@ -3,15 +3,14 @@ const axios = require('axios');
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const dotenv = require('dotenv');
 
-require('dotenv').config();
-
+dotenv.config({ path: '.env' });
 
 app.use(cors());
 
 // query chat gpt for code insertion
 app.get('/query', async function (req, res) {
-    let fullResponse = ""
     try {
         let {context, prompt} = req.query;
         prompt += ". You should only respond with code, no other words or labels.";
@@ -60,7 +59,6 @@ app.get('/query', async function (req, res) {
                     let parsedData;
                     try {
                         const formattedChunk = '{"' + chunkLine.slice(0, 4) + '"' + chunkLine.slice(4) + "}";
-                        console.log('formattedChunk', formattedChunk)
                         parsedData = JSON.parse(formattedChunk);
                     } catch (e) {
                         // If the chunk cannot be parsed, it might be incomplete, so we will wait for more data
@@ -75,9 +73,7 @@ app.get('/query', async function (req, res) {
                         if (contentData.slice(0, 5) === "html") {
                             contentData = contentData.slice(5);
                         }
-                        fullResponse += contentData;
                         let res_data = `event: message\ndata: {"data": ${JSON.stringify(contentData)}}\n\n`
-                        console.log('res_data', res_data)
                         res.write(res_data);
                     }
                 }
@@ -86,7 +82,6 @@ app.get('/query', async function (req, res) {
             response.data.on('end', () => {
                 res.write('event: DONE\ndata: {"data": "stream finished"}\n\n');
                 res.end();
-                console.log('full response', fullResponse)
             });
         } catch (error) {
             console.error(`Request failed: ${error}`);
@@ -99,7 +94,6 @@ app.get('/query', async function (req, res) {
 
 // query chat gpt for chatting
 app.get('/chat', async function (req, res) {
-    let fullResponse = ""
     try {
         const prompt = req.query.prompt;
         try {
@@ -143,7 +137,6 @@ app.get('/chat', async function (req, res) {
                     let parsedData;
                     try {
                         const formattedChunk = '{"' + chunkLine.slice(0, 4) + '"' + chunkLine.slice(4) + "}";
-                        console.log('formattedChunk', formattedChunk)
                         parsedData = JSON.parse(formattedChunk);
                     } catch (e) {
                         // If the chunk cannot be parsed, it might be incomplete, so we will wait for more data
@@ -152,9 +145,7 @@ app.get('/chat', async function (req, res) {
                     if (parsedData.data.choices && parsedData.data.choices[0].delta && parsedData.data.choices[0].delta.content
                         && parsedData.data.choices[0].delta.content !== "") {
                         let contentData = parsedData.data.choices[0].delta.content;
-                        fullResponse += contentData;  // for debugging
                         let res_data = `event: message\ndata: {"data": ${JSON.stringify(contentData)}}\n\n`
-                        console.log('res_data', res_data)
                         res.write(res_data);
                     }
                 }
@@ -163,7 +154,6 @@ app.get('/chat', async function (req, res) {
             response.data.on('end', () => {
                 res.write('event: DONE\ndata: {"data": "stream finished"}\n\n');
                 res.end();
-                console.log('full response', fullResponse)
             });
         } catch (error) {
             console.error(`Request failed: ${error}`);

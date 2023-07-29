@@ -1,0 +1,18 @@
+# Use a lightweight version of Node.js as the base image
+FROM node:20-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the code
+COPY . .
+
+EXPOSE 3003
+
+CMD [ "npm", "start" ]

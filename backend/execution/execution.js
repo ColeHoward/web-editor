@@ -6,7 +6,7 @@ const AWS = require('aws-sdk');
 const ProjectManager = require('./ProjectManager');
 const fs = require('fs');
 const path = require('path');
-const dotenv = require('dotenv');0
+const dotenv = require('dotenv');
 
 dotenv.config({ path: '.env' });
 
@@ -58,10 +58,10 @@ const upload = multer({ storage: storage });
 
 let containerActivity = {};  // Maps container IDs to the last time they were active
 
+const baseDir = process.env.BASE_DIR;
 
 app.post('/projects', upload.none(), async (req, res) => {
     const { userId, projectName } = req.body;
-
     if (!projectName) {
         return res.status(400).send("Project name is required");
     }
@@ -71,8 +71,7 @@ app.post('/projects', upload.none(), async (req, res) => {
     }
     let hostProjectPath = "";
     try {
-        const currPath = process.cwd();
-        hostProjectPath = path.join(currPath, userId, projectName);
+        hostProjectPath = path.join(baseDir, userId, projectName);
 
         fs.mkdirSync(hostProjectPath, { recursive: true });
 
@@ -119,7 +118,6 @@ app.post('/projects', upload.none(), async (req, res) => {
 app.post('/projects/:projectName', async (req, res) => {
     const userId = req.body.userId;
     const projectName = req.params.projectName;
-    console.log(req.body, projectName)
     if (!projectName || !userId) {
         return res.status(400).json({ error: 'User ID and Project name are required' });
     }
@@ -136,7 +134,7 @@ app.post('/projects/:projectName', async (req, res) => {
     }
     let hostProjectPath;
     try {
-        hostProjectPath = path.join(process.cwd(), userId, projectName);
+        hostProjectPath = path.join(baseDir, userId, projectName);
         await fs.promises.mkdir(hostProjectPath, { recursive: true });
 
         for (const [filePath, fileContent] of Object.entries(files)) {
@@ -173,15 +171,14 @@ app.post('/projects/:projectName', async (req, res) => {
         return res.json({ container_id: container.id });
     } catch (error) {
         console.error(error);
+
         return res.status(500).json({ error: 'Failed to create execution environment' });
     }
 });
 
 app.get('/execute', (req, res) => {
-
     const containerId = req.query.containerId;
     const filepath = req.query.filepath;
-    console.log('executing', containerId, filepath)
     const container = docker.getContainer(containerId);
     const command = ['python', '-u', `./${filepath}`];
 
@@ -214,7 +211,6 @@ app.get('/execute', (req, res) => {
                 // After the data stream has ended
                 res.write('event: DONE\n');
                 res.end();
-                console.log('Stream ended');
             });
         });
     });
@@ -224,7 +220,6 @@ app.get('/execute', (req, res) => {
 
 app.put('/projects/:projectName/files', upload.single('file'), async (req, res) => {
     if (!req.file || !req.body.userId || !req.params.projectName || !req.body.filePath) {
-        console.log('One or more request arguments are missing')
         return res.status(400).json({ message: "One or more request arguments are missing" });
     }
     const containerId = req.body.containerId
@@ -242,22 +237,7 @@ app.put('/projects/:projectName/files', upload.single('file'), async (req, res) 
 
     // Check if directory exists and create if it doesn't
     if (!fs.existsSync(dir)) {
-        console.log("Directory does not exist. Creating...");
         fs.mkdirSync(dir, { recursive: true });
-        console.log("Directory created");
-    } else {
-        console.log("Directory already exists");
-    }
-
-
-    try {
-        const stats = await fs.promises.stat(hostFilePath);
-        if (stats.isFile()) {
-            console.log("File already exists, it will be overwritten");
-        }
-    } catch (err) {
-        // File does not exist or there was an error checking, continue with writing
-        console.log("File does not exist or error occurred while checking, will write new file");
     }
 
     // Move the temporary file to the desired location

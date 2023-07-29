@@ -1,0 +1,54 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile-frontend
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    command: npm start
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - gpt
+      - file_storage
+      - execution
+
+  gpt:
+    build:
+      context: ./backend/gpt
+      dockerfile: Dockerfile-gpt
+    volumes:
+      - ./backend/gpt:/app
+    ports:
+      - "3001:3001"
+    command: node gpt.js
+    environment:
+      - NODE_ENV=development
+
+  file_storage:
+    build:
+      context: ./backend/file-storage
+      dockerfile: Dockerfile-fileStorage
+    volumes:
+      - ./backend/file-storage:/app
+    ports:
+        - "3002:3002"
+    command: node fileStorage.js
+    environment:
+      - NODE_ENV=development
+
+  execution:
+    build:
+      context: ./backend/execution
+      dockerfile: Dockerfile-execution
+    volumes:
+      - ./backend/execution:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+        - "3003:3003"
+    command: node execution.js
+    environment:
+      - NODE_ENV=development

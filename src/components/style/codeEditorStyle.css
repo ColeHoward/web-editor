@@ -15,3 +15,27 @@
 ::-webkit-scrollbar {
     display: none;
 }
+
+.ͼ2 .cm-gutters {
+    background-color: #1e1e1e;
+    border-right: 1px solid #1e1e1e;
+}
+.cm-scroller, .cm-line {
+    background-color: rgba(31, 31, 31, .5);
+}
+.code-editor {
+    color: whitesmoke;
+}
+.ͼ2 .cm-activeLine {
+    background-color: rgba(60, 60, 60, .5);
+}
+.ͼ2 .cm-activeLineGutter {
+    background-color: rgba(60, 60, 60, .5);
+}
+.cm-cursor {
+    border-left: 1.2px solid whitesmoke !important;  /* change to desired cursor color */
+}
+.ͼ4 .cm-selectionBackground {
+    background-color: rgb(91, 124, 153, .5);
+
+}

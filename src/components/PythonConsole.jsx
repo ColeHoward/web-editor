@@ -1,16 +1,15 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/pythonConsoleStyle.css'
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card } from 'react-bootstrap';
 import playIcon from  '../assets/icons/play-solid.svg';
 import SimpleBar from "simplebar-react";
 const { SSE } = require('sse.js');
 
 
-function PythonConsole({ pythonCode, consoleOutput, setConsoleOutput, containerId, filePath }) {
+function PythonConsole({consoleOutput, setConsoleOutput, containerId, filePath }) {
 
 	const runPythonCode = () => {
-		if (!pythonCode.trim()) return;
 		setConsoleOutput('');
 		const url = `http://localhost:3003/execute?containerId=${containerId}&filepath=${filePath}`;
 

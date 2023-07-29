@@ -1,0 +1,19 @@
+# dockerfile for react frontend
+FROM node:20-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the code
+COPY . .
+
+EXPOSE 3000
+
+# Use a start script instead of directly calling Node
+CMD [ "npm", "start" ]

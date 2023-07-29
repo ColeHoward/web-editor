@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 import {Tab, Box } from '@mui/material';
 import TabPanel from '@mui/lab/TabPanel';
 import TabList from '@mui/lab/TabList';
@@ -6,8 +6,11 @@ import TabContext from '@mui/lab/TabContext';
 import PythonConsole from "./PythonConsole";
 import ChatPanel from "./ChatPanel";
 import {HtmlRenderer} from "./HtmlRenderer";
+import {FilesContext} from "../providers/FilesProvider";
 
-const TabbedHelper = ({ setCode, language, files, setFiles, code, currWidth, currFilePath, containerId }) => {
+
+const TabbedHelper = ({ language, code, currWidth, containerId }) => {
+	const { currFile } = useContext(FilesContext);
 	const [selectedTab, setSelectedTab] = useState("Run");
 	// const areAnyFilesOpen = Object.values(files).some(file => file.isOpen);
 	const [messages, setMessages] = useState([]);
@@ -15,8 +18,8 @@ const TabbedHelper = ({ setCode, language, files, setFiles, code, currWidth, cur
 	const outputTab = () => {
 		if (language === "python") {
 			return (
-				<PythonConsole language={language} pythonCode={code} consoleOutput={consoleOutput}
-							   setConsoleOutput={setConsoleOutput} filePath={currFilePath} containerId={containerId}
+				<PythonConsole language={language} consoleOutput={consoleOutput}
+							   setConsoleOutput={setConsoleOutput} filePath={currFile} containerId={containerId}
 				/>
 			)
 		}else if (language === "html") {

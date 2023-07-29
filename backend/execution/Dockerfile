@@ -1,3 +1,4 @@
+# Dockerfile-frontend for sandboxed environment for user files
 FROM python:3.11
 
 # Create a new user "appuser" inside the container

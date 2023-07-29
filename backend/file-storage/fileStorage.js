@@ -2,9 +2,9 @@ const express = require('express');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const AWS = require('aws-sdk');
+const { S3Client } = require("@aws-sdk/client-s3");
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
 
 require('dotenv').config();
 
@@ -31,56 +31,42 @@ app.use(cors());
 
 const upload = multer({
     storage: multerS3({
-        s3: s3,
+        s3: new S3Client({
+            region: process.env.S3_REGION,
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+            }
+        }),
         bucket: process.env.AWS_S3_BUCKET_NAME,
         metadata: function (req, file, cb) {
             cb(null, { fieldName: file.fieldname });
         },
         key: function (req, file, cb) {
-            cb(null, Date.now().toString() + "-" + file.originalname)
+            const userId = req.body.userId;
+            const filename = req.body.filename;
+
+            const s3key = `${userId}/${filename}`;
+            cb(null, s3key);
         }
     })
 });
 
 // this will either create a new file or update an existing one
 app.put('/put-file', upload.single('file'), async function (req, res, next) {
-    // formData.append('userId', userId);
-    // formData.append('projectId', projectId);
-    // formData.append('filename', fileName)
-    // formData.append('code', fileContent);
-    // formData.append('language', language);
-
-    const codeString = req.body.code;  // not storing on DynamoDB, only S3
     const userId = req.body.userId
     const projectId = req.body.projectId // may not be needed because path has project name in it?
     const filename = req.body.filename
     const language = req.body.language
-    console.log('filename:', filename)
-    // const projectType = req.body.projectType // e.g. html, js, python, etc., could maybe just append to project name
-    // TODO add container ID for the project, either in the project name or as a separate field
-    /*********************************************** STORE FILES ON S3 ***********************************************/
-    const params = {
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
-        Key: `${userId}/${projectId}/${filename}`,
-        Body: codeString  // file content
-    };
-    let s3Upload;
-    try {
-        s3Upload = await s3.upload(params).promise();  // similar to PUT request
-    } catch (error) {
-        console.error('Error uploading to S3:', error);
-        res.status(500).send(error);
-        return;
-    }
 
     /*********************** STORE METADATA WITH FLATTENED HIERARCHICAL STRUCTURE  ON DYNAMODB ***********************/
     const dbParams = {
         TableName: process.env.DYNAMODB_TABLE_NAME,
         Item: {
             "PK": `user#${userId}`,
-            "SK": `project#${projectId}_file#${filename}`,
-            "fileLink": s3Upload.Location,
-            "s3_key": s3Upload.Key,
+            "SK": `project#${projectId}_file#${filename.replace(`${projectId}/`, '')}`,
+            "fileLink": req.file.location,
+            "s3_key": req.file.key,
             "language": language,
         }
     };
@@ -92,7 +78,7 @@ app.put('/put-file', upload.single('file'), async function (req, res, next) {
         console.error('Error updating DynamoDB:', error);
     }
 
-    res.send({ s3Upload, dynamoResponse });
+    res.send({ dynamoResponse });
 });
 
 // should have authentication in production (so someone that gets their userId can't see all their projects)
