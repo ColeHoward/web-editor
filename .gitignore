@@ -1,3 +1,4 @@
 node_modules
 rollup.config.js
 .DS_Store
+.env
