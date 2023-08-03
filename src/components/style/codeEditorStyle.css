@@ -7,9 +7,9 @@
     src: url("../../assets/fonts/JetBrainsMono/fonts/ttf/JetBrainsMono-Regular.ttf") format("truetype");
 }
 
-.ͼ15.cm-editor .cm-scroller {
-    font-family: "Fira Code", monospace;
-    /*font-family: "JetBrains Mono", monospace;*/
+.ͼ1 .cm-scroller {
+    /*font-family: "Fira Code", monospace;*/
+    font-family: "JetBrains Mono", monospace;
 }
 
 ::-webkit-scrollbar {

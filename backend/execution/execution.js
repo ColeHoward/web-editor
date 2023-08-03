@@ -118,6 +118,7 @@ app.post('/projects', upload.none(), async (req, res) => {
 app.post('/projects/:projectName', async (req, res) => {
     const userId = req.body.userId;
     const projectName = req.params.projectName;
+    console.log(userId, projectName)
     if (!projectName || !userId) {
         return res.status(400).json({ error: 'User ID and Project name are required' });
     }
@@ -136,11 +137,13 @@ app.post('/projects/:projectName', async (req, res) => {
     try {
         hostProjectPath = path.join(baseDir, userId, projectName);
         await fs.promises.mkdir(hostProjectPath, { recursive: true });
+        console.log('hostProjectPath', hostProjectPath)
 
         for (const [filePath, fileContent] of Object.entries(files)) {
             const newPath = path.join(hostProjectPath, filePath);
+            console.log('newPath', newPath)
             await fs.promises.mkdir(path.dirname(newPath), { recursive: true });
-            await fs.promises.writeFile(newPath, fileContent['content']);
+            await fs.promises.writeFile(newPath, fileContent['content'] || '');
         }
 
     } catch (error) {

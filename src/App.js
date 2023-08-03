@@ -8,7 +8,7 @@ import {setupEnv} from "./utilities/api";
 
 
 const testProjectId = "testProject";
-const testUserId = "Cade";
+const testUserId = "Cole";
 
 function App() {
     // TODO move this logic into open/create project page

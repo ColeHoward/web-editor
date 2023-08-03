@@ -66,7 +66,6 @@ export function DevelopmentPage({language, userId, projectId, projectTree, conta
 	const editorRef = useRef(null);
 
 	const handleContextMenu = (event) => {
-		return
 		event.preventDefault();
 
 		if (editorRef.current) {
@@ -97,6 +96,9 @@ export function DevelopmentPage({language, userId, projectId, projectTree, conta
 				isVisible={promptBoxVisible}
 				onCancel={handlePromptCancel}
 				position={menuPosition}
+				setVisible={setPromptBoxVisible}
+				selectedText={selectedText.current}
+				editorRef={editorRef}
 			/>
 			{showMenu && (
 				<ContextMenu menuPosition={menuPosition} setPromptBoxVisible={setPromptBoxVisible}

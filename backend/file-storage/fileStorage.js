@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
@@ -6,7 +7,6 @@ const { S3Client } = require("@aws-sdk/client-s3");
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-require('dotenv').config();
 
 const port = 3002;
 
@@ -14,6 +14,9 @@ AWS.config.update({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
+
+
+AWS.config.logger = console;
 
 const s3 = new AWS.S3({
     region: process.env.S3_REGION

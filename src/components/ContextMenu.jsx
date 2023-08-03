@@ -11,7 +11,7 @@ import ContentCopy from '@mui/icons-material/ContentCopy';
 import ContentPaste from '@mui/icons-material/ContentPaste';
 import Cloud from '@mui/icons-material/Cloud';
 import {copyToClipboard, pasteFromClipboard, cutToClipboard} from '../utilities/Clipboard';
-
+import {getSelectedText} from '../utilities/utils';
 
 
 
@@ -30,15 +30,7 @@ export default function ContextMenu({ menuPosition, setPromptBoxVisible, setShow
 		};
 	}, [showMenu]);
 
-	const getSelectedText = () => {
-		let text = "";
-		if (window.getSelection) {
-			text = window.getSelection().toString();
-		} else if (document.selection && document.selection.type !== "Control") {
-			text = document.selection.createRange().text;
-		}
-		return text;
-	};
+
 
 	return (
 		<Paper sx={{width: "250px", maxWidth: '320px', position: "fixed",

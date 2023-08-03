@@ -5,11 +5,12 @@ import SendIcon from "./icons/SendIcon"
 import {insertGPTResponse} from "../utilities/utils";
 
 
-function PromptBox({ isVisible, onCancel, position }) {
+function PromptBox({ isVisible, onCancel, position, editorRef, setVisible, selectedText }) {
 	const [inputValue, setInputValue] = React.useState('');
 	const toastRef = useRef(null);
 	const [textAreaHeight, setTextAreaHeight] = React.useState(20);
 	const [width, setWidth] = React.useState(400);
+
 	useEffect(() => {
 		const observer = new ResizeObserver(entries => {
 			for (let entry of entries) {
@@ -46,7 +47,7 @@ function PromptBox({ isVisible, onCancel, position }) {
 
 
 	const handleSubmit = useCallback(() => {
-		insertGPTResponse(inputValue)
+		insertGPTResponse(inputValue, editorRef, selectedText, setVisible);
 		onCancel();
 		setInputValue('');
 	}, [inputValue]);

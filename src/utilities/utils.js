@@ -81,7 +81,7 @@ export const insertGPTResponse = async (prompt, editorRef, selectedText, setProm
     if (editorRef.current) {
         originalSelection = editorRef.current.state.selection.main;
     }
-    await askGPT(prompt, selectedText.current, async (chunk) => {
+    await askGPT(prompt, selectedText, async (chunk) => {
         if (editorRef.current) {
             const editor = editorRef.current;
             if (chunk !== "j7&c#0Y7*O$X@Iz6E59Ix") {
@@ -114,3 +114,12 @@ export function debounce(func, delay) {
         }, delay);
     };
 }
+export const getSelectedText = () => {
+    let text = "";
+    if (window.getSelection) {
+        text = window.getSelection().toString();
+    } else if (document.selection && document.selection.type !== "Control") {
+        text = document.selection.createRange().text;
+    }
+    return text;
+};

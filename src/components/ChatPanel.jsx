@@ -46,11 +46,11 @@ const ChatPanel = ({selectedText, messages, setMessages, currWidth}) => {
 			<Box className={"prompt-response"} sx={{ display: 'block', flexDirection: 'column', height: `calc(90vh - 12px - ${textAreaHeight}px)`, width: '100%', overflow: 'auto',
 				p: 1, border: 1, borderColor: 'divider', borderBottomLeftRadius: '5px' , borderBottomRightRadius: '5px', alignItems: "flex-start", padding: "10px 0px 10px 0px", justifyContent: "flex-start",
 				backgroundColor: "#1e1e1e", overflowY: "auto"}}>
-				{messages.map((message, index) => {
+				{messages.map((message, cardIndex) => {
 					const chunks = message.text.split("```");
 					let codeBlockOpen = false;
 					return (
-						<Card variant="outlined"
+						<Card variant="outlined" key={cardIndex}
 							  sx={{
 								  bgcolor: message.from === 'user' ? 'rgba(255, 255, 255, 0.06);': '#1e1e1e',
 								  width: "100%",
@@ -60,17 +60,18 @@ const ChatPanel = ({selectedText, messages, setMessages, currWidth}) => {
 								  borderRadius: "0",
 								  margin: "10px 0",
 							  }}>
-							{chunks.map(chunk => {
+							{chunks.map((chunk, chunkIndex) => {
 								if (codeBlockOpen) {
 									codeBlockOpen = false;
 									const lines = chunk.split('\n');
 									const language = lines[0];  // The first line is the language
 									const code = lines.slice(1).join('\n');  // The rest is the code
-									return <CodeBlock language={language} code={code} />
+									return <CodeBlock key={chunkIndex} language={language} code={code} />
 								} else {
 									codeBlockOpen = true;
 									return (
-										<Typography variant="body1" color={message.from === 'user' ? 'whitesmoke': 'whitesmoke'}
+										<Typography key={chunkIndex}
+											variant="body1" color={message.from === 'user' ? 'whitesmoke': 'whitesmoke'}
 													style={{
 														padding: "5px",
 														whiteSpace: 'pre-wrap',
