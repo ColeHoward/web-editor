@@ -1,4 +1,4 @@
-# Web-Based Code Editor
+# Web-Based Code Editor with LLM Coding Assistant
 - Under development
 
 ## Setup
